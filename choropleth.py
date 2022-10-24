@@ -49,14 +49,16 @@ def createMap():
     municipalityGeoJson = json.load(open('myJson.geojson'))
     df = pd.read_csv("CM2020-2021.csv")
 
-    fig = px.choropleth(df, geojson=municipalityGeoJson, color="MORENA",
+    fig = px.choropleth(df, geojson=municipalityGeoJson, color="PRI",
                         locations="CVE", featureidkey="properties.CVEGEO",
-                        color_continuous_scale="Viridis",
+                        color_continuous_scale="PuRd",
+                        title='D:'
                         )
 
     fig.update_geos(fitbounds="locations", visible=False)
     fig.update_layout(margin={"r": 100, "t": 100, "l": 100, "b": 100})
     fig.show()
+    fig.write_html("file.html")
 
 
 def main():
