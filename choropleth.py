@@ -1,10 +1,14 @@
+import argparse
 import csv
 import json
+from ast import parse
+from email.policy import default
+
 import geopandas
-import shapefile
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import shapefile
 
 mapbox_access_token = 'pk.eyJ1IjoiZXJpY2tuYXZlIiwiYSI6ImNrdDh3MnppbzE2NXIydm5ybWtkNjM5Y3UifQ.4bfoMQc-wQkbI7f2YQRhUA'
 
@@ -61,14 +65,16 @@ def createMap():
     fig.write_html("file.html")
     
     
-def createSectionMap():
-    municipalityShp = geopandas.read_file("assets/Tabasco/secc.shp")
-    municipalityShp[(municipalityShp.entidad == 28) & (municipalityShp.distrito_f==6)].to_file('myJson.geojson', driver='GeoJSON')
+def createSectionMap(pathGeojson: str, pathData:str , queryString: str, keyToMap:str,locations: str, featureidKey:str):
+    municipalityShp = geopandas.read_file(pathGeojson)
+    if queryString != "":
+       municipalityShp.query(queryString, inplace=True)
+    municipalityShp.to_file('myJson.geojson', driver='GeoJSON')
     municipalityGeoJson = json.load(open('myJson.geojson'))
-    df = pd.read_csv("section2020-2021.csv")
+    df = pd.read_csv(pathData)
 
-    fig = px.choropleth(df, geojson=municipalityGeoJson, color="PT",
-                        locations="SECCION", featureidkey="properties.seccion",
+    fig = px.choropleth(df, geojson=municipalityGeoJson, color=keyToMap,
+                        locations=locations, featureidkey=featureidKey,
                         color_continuous_scale="PuRd",
                         title='D:'
                         )
@@ -78,7 +84,16 @@ def createSectionMap():
     fig.show()
 
 def main():
-    createSectionMap()
+    parser =  argparse.ArgumentParser(description="Render maps of votes")
+    parser.add_argument("--pathGeojson", type=str, default="assets/Tabasco/mun.shp")
+    parser.add_argument("--pathData", type=str, default='CM2020-2021.csv')
+    parser.add_argument("--keyToMap", type=str, required=True)
+    parser.add_argument("--locations", type=str, default="CVE")
+    parser.add_argument("--featureidKey", type=str, default="properties.CVEGEO")
+    parser.add_argument("--query", type=str, default="")
+    
+    arguments = parser.parse_args()
+    createSectionMap(arguments.pathGeojson ,arguments.pathData , arguments.query, arguments.keyToMap, arguments.locations, arguments.featureidKey)
 
 
 if __name__ == "__main__":
