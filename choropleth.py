@@ -56,44 +56,61 @@ def createMap():
     fig = px.choropleth(df, geojson=municipalityGeoJson, color="PT",
                         locations="CVE", featureidkey="properties.CVEGEO",
                         color_continuous_scale="PuRd",
-                        title='D:'
+                        title='Información Por Municipio'
                         )
 
     fig.update_geos(fitbounds="locations", visible=False)
     fig.update_layout(margin={"r": 100, "t": 100, "l": 100, "b": 100})
     fig.show()
     fig.write_html("file.html")
+
+def printRow(row):
+    return (row['TOTAL DE VOTOS'] * 100) / row['LISTA NOMINAL']
+
+def createSectionMap(pathGeojson: str, pathData: str, queryString: str, keyToMap: str, locations: str, featureidKey: str, additionalData: str):
     
-    
-def createSectionMap(pathGeojson: str, pathData:str , queryString: str, keyToMap:str,locations: str, featureidKey:str):
+    if additionalData == '':
+        hoverData = []
+    else:
+        hoverData = additionalData.split(',')
+        
     municipalityShp = geopandas.read_file(pathGeojson)
     if queryString != "":
-       municipalityShp.query(queryString, inplace=True)
+        municipalityShp.query(queryString, inplace=True)
     municipalityShp.to_file('myJson.geojson', driver='GeoJSON')
     municipalityGeoJson = json.load(open('myJson.geojson'))
     df = pd.read_csv(pathData)
-
+    
+    db = df.groupby(['SECCION ELECTORAL']).sum(numeric_only=True).T.T.reset_index()
+    db['% PARTICIPACION'] = db.apply(lambda row : printRow(row), axis=1)
+    
     fig = px.choropleth(df, geojson=municipalityGeoJson, color=keyToMap,
                         locations=locations, featureidkey=featureidKey,
                         color_continuous_scale="PuRd",
-                        title='D:'
+                        hover_data=hoverData,
+                        title='Información por sección'
                         )
 
     fig.update_geos(fitbounds="locations", visible=False)
     fig.update_layout(margin={"r": 100, "t": 100, "l": 100, "b": 100})
     fig.show()
 
+
 def main():
-    parser =  argparse.ArgumentParser(description="Render maps of votes")
-    parser.add_argument("--pathGeojson", type=str, default="assets/Tabasco/mun.shp")
+    parser = argparse.ArgumentParser(description="Render maps of votes")
+    parser.add_argument("--pathGeojson", type=str,
+                        default="assets/Tabasco/mun.shp")
     parser.add_argument("--pathData", type=str, default='CM2020-2021.csv')
     parser.add_argument("--keyToMap", type=str, required=True)
     parser.add_argument("--locations", type=str, default="CVE")
-    parser.add_argument("--featureidKey", type=str, default="properties.CVEGEO")
+    parser.add_argument("--featureidKey", type=str,
+                        default="properties.CVEGEO")
     parser.add_argument("--query", type=str, default="")
-    
+    parser.add_argument("--additionalData", type=str, default="")
+
     arguments = parser.parse_args()
-    createSectionMap(arguments.pathGeojson ,arguments.pathData , arguments.query, arguments.keyToMap, arguments.locations, arguments.featureidKey)
+    createSectionMap(arguments.pathGeojson, arguments.pathData, arguments.query,
+                     arguments.keyToMap, arguments.locations, arguments.featureidKey, arguments.additionalData)
 
 
 if __name__ == "__main__":
