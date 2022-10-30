@@ -1,0 +1,58 @@
+CLAVE MUNICIPIO MUNICIPIO
+1	Balancan
+2	Cardenas
+3	Centla
+4	Centro
+5	Comalcalco
+6	Cunduacán
+7	Emiliano Zapata
+8	Huimanguillo
+9	Jalapa
+10	Jalpa de Mendez
+11	Jonuta
+12	Macuspana
+13	Nacajuca
+14	Paraiso
+15	Tacotalpa
+16	Teapa
+17	Tenosique
+
+
+2020-2021
+---AYUNTAMIENTO
+ESTADO
+python .\choropleth.py --pathGeojson assets/Tabasco/secc.shp --pathData mapas/2020-2021/csv/ayu_resumen_general.csv --keyToMap MORENA --locations "SECCION ELECTORAL" --featureidKey properties.seccion --query "entidad == 27" --additionalData "NUMERO DE VOTOS VALIDOS,NUMERO DE VOTOS NULOS,TOTAL DE VOTOS,LISTA NOMINAL,% PARTICIPACION"  
+
+MUNICIPIO
+python .\choropleth.py --pathGeojson assets/Tabasco/secc.shp --pathData mapas/2020-2021/csv/ayu_resumen_general.csv --keyToMap MORENA --locations "SECCION ELECTORAL" --featureidKey properties.seccion --query "entidad == 27 & municipio == 1" --queryDF "MUNICIPIO == 'BALANCAN'" --additionalData "NUMERO DE VOTOS VALIDOS,NUMERO DE VOTOS NULOS,TOTAL DE VOTOS,LISTA NOMINAL,% PARTICIPACION"
+
+
+---DIPUTADOS
+ESTADO
+python .\choropleth.py --pathGeojson assets/Tabasco/secc.shp --pathData mapas/2020-2021/csv/dip_resumen_general.csv --keyToMap MORENA --locations "SECCION ELECTORAL" --featureidKey properties.seccion --query "entidad == 27" --additionalData "NUMERO DE VOTOS VALIDOS,NUMERO DE VOTOS NULOS,TOTAL DE VOTOS,LISTA NOMINAL,% PARTICIPACION"
+
+MUNICIPIO
+python .\choropleth.py --pathGeojson assets/Tabasco/secc.shp --pathData mapas/2020-2021/csv/dip_resumen_general.csv --keyToMap MORENA --locations "SECCION ELECTORAL" --featureidKey properties.seccion --query "entidad == 27 & municipio == 1" --queryDF "MUNICIPIO == 'BALANCAN'" --additionalData "NUMERO DE VOTOS VALIDOS,NUMERO DE VOTOS NULOS,TOTAL DE VOTOS,LISTA NOMINAL,% PARTICIPACION"
+
+
+2017-2018
+---AYUNTAMIENTO
+ESTADO
+python .\choropleth.py --pathGeojson assets/Tabasco/secc.shp --pathData mapas/2017-2018/csv/ayu_general_casillas.csv --keyToMap MORENA --locations "SECCION ELECTORAL" --featureidKey properties.seccion --query "entidad == 27" --additionalData "NUMERO DE VOTOS VALIDOS,NUMERO DE VOTOS NULOS,TOTAL DE VOTOS,LISTA NOMINAL,% PARTICIPACION"  
+
+MUNICIPIO
+python .\choropleth.py --pathGeojson assets/Tabasco/secc.shp --pathData mapas/2017-2018/csv/ayu_general_casillas.csv --keyToMap MORENA --locations "SECCION ELECTORAL" --featureidKey properties.seccion --query "entidad == 27 & municipio == 1" --queryDF "MUNICIPIO == 'BALANCAN'" --additionalData "NUMERO DE VOTOS VALIDOS,NUMERO DE VOTOS NULOS,TOTAL DE VOTOS,LISTA NOMINAL,% PARTICIPACION"
+
+---DIPUTADOS
+ESTADO
+python .\choropleth.py --pathGeojson assets/Tabasco/secc.shp --pathData mapas/2017-2018/csv/dip_resumen_general.csv --keyToMap MORENA --locations "SECCION ELECTORAL" --featureidKey properties.seccion --query "entidad == 27" --additionalData "NUMERO DE VOTOS VALIDOS,NUMERO DE VOTOS NULOS,TOTAL DE VOTOS,LISTA NOMINAL,% PARTICIPACION"  
+
+MUNICIPIO
+python .\choropleth.py --pathGeojson assets/Tabasco/secc.shp --pathData mapas/2017-2018/csv/dip_resumen_general.csv --keyToMap MORENA --locations "SECCION ELECTORAL" --featureidKey properties.seccion --query "entidad == 27 & municipio == 1" --queryDF "MUNICIPIO == 'BALANCAN'" --additionalData "NUMERO DE VOTOS VALIDOS,NUMERO DE VOTOS NULOS,TOTAL DE VOTOS,LISTA NOMINAL,% PARTICIPACION"
+
+---GUB
+ESTADO
+python .\choropleth.py --pathGeojson assets/Tabasco/secc.shp --pathData mapas/2017-2018/csv/gub_resumen_general.csv --keyToMap MORENA --locations "SECCION ELECTORAL" --featureidKey properties.seccion --query "entidad == 27" --additionalData "NUMERO DE VOTOS VALIDOS,NUMERO DE VOTOS NULOS,TOTAL DE VOTOS,LISTA NOMINAL,% PARTICIPACION"  
+
+MUNICIPIO
+python .\choropleth.py --pathGeojson assets/Tabasco/secc.shp --pathData mapas/2017-2018/csv/gub_resumen_general.csv --keyToMap MORENA --locations "SECCION ELECTORAL" --featureidKey properties.seccion --query "entidad == 27 & municipio == 1" --queryDF "MUNICIPIO == 'BALANCAN'" --additionalData "NUMERO DE VOTOS VALIDOS,NUMERO DE VOTOS NULOS,TOTAL DE VOTOS,LISTA NOMINAL,% PARTICIPACION"
