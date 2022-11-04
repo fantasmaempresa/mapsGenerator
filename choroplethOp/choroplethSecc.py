@@ -9,9 +9,15 @@ import plotly.graph_objects as go
 from choropleth import *
 
 
-def choroplethSecc(pathData: str, keyToMap: str):
+def choroplethSecc(pathData: str, keyToMap: str, municipality: int):
     municipalityGeoJson = json.load(open('myJson.geojson', encoding="utf8"))
+    municipalities = pd.read_csv("assets/Tabasco/municipios.csv")
     df = pd.read_csv(pathData)
+
+    if municipality != 0:
+        municipalities.query('clave == @municipality', inplace=True)
+        value = municipalities.iloc[0]['municipio']
+        df.query('MUNICIPIO == @value', inplace=True)
 
     db = df.groupby(['SECCION ELECTORAL']).sum(numeric_only=True).T.T.reset_index()
     db['% PARTICIPACION'] = db.apply(lambda row: printRow(row), axis=1)
@@ -27,17 +33,23 @@ def choroplethSecc(pathData: str, keyToMap: str):
     return fig
 
 
-def comparisonSecc(politicalPartiesArr, pathData: str):
+def comparisonSecc(politicalPartiesArr, pathData: str, municipality: int):
+    df = pd.read_csv(pathData)
+    municipalities = pd.read_csv("assets/Tabasco/municipios.csv")
     municipalityGeoJson = geopandas.read_file('assets/Tabasco/secc.shp')
     
     municipalityGeoJson.query("entidad == 27", inplace=True)
     
+    if municipality != 0:
+        municipalityGeoJson.query('municipio == @municipality', inplace=True)
+        municipalities.query('clave == @municipality', inplace=True)
+        value = municipalities.iloc[0]['municipio']
+        df.query('MUNICIPIO == @value', inplace=True)
     
     municipalityGeoJson.to_file('myJson.geojson', driver='GeoJSON')
     municipalityGeoJson = json.load(open('myJson.geojson', encoding="utf8"))
 
-    df = pd.read_csv(pathData)
-
+    
     db = df.groupby(['SECCION ELECTORAL']).sum(
         numeric_only=True).T.T.reset_index()
 
@@ -58,17 +70,26 @@ def comparisonSecc(politicalPartiesArr, pathData: str):
     return fig
 
 
-def pageSecc(politicalParties: str, pathData: str, keyToMap: str):
+def pageSecc(politicalParties: str, pathData: str, keyToMap: str, municipality: str):
     app = Dash(__name__)
     df = pd.read_csv(pathData)
+    municipalities = pd.read_csv("assets/Tabasco/municipios.csv")
+    title = "Análisis por Secciones"
+
+    if municipality != 0:
+        municipalities.query('clave == @municipality', inplace=True)
+        value = municipalities.iloc[0]['municipio']
+        title = title + " " + " Municipio: " + municipalities.iloc[0]['municipio']
+        df.query('MUNICIPIO == @value', inplace=True)
 
     db = df.groupby(['SECCION ELECTORAL']).sum(
         numeric_only=True).T.T.reset_index()
 
     db['% PARTICIPACION'] = db.apply(lambda row: printRow(row), axis=1)
 
-    db.drop('DISTRITO L', axis=1, inplace=True)
-    db.drop('DISTRITO F', axis=1, inplace=True)
+    db.drop('DISTRITO L', axis=1, inplace=True, errors='ignore')
+    db.drop('DISTRITO F', axis=1, inplace=True, errors='ignore')
+    db.drop('% PARTICIPACION CIUDADANA', axis=1, inplace=True, errors='ignore')
 
     politicalPartiesArr = politicalParties.split(',')
 
@@ -78,7 +99,7 @@ def pageSecc(politicalParties: str, pathData: str, keyToMap: str):
                 id="banner",
                 className="banner",
                 children=[
-                    html.H2("Análisis por Municipios"),
+                    html.H2(title),
                 ],
             ),
             html.Div(
@@ -96,7 +117,7 @@ def pageSecc(politicalParties: str, pathData: str, keyToMap: str):
                                         children=dcc.Graph(
                                             id="geo-map",
                                             figure=comparisonSecc(
-                                                politicalPartiesArr, pathData),
+                                                politicalPartiesArr, pathData, municipality),
                                         ),
                                     )
                                 ],
@@ -109,7 +130,7 @@ def pageSecc(politicalParties: str, pathData: str, keyToMap: str):
                                         children=dcc.Graph(
                                             id="geo-map 2",
                                             figure=choroplethSecc(
-                                                pathData, keyToMap),
+                                                pathData, keyToMap, municipality),
                                         ),
                                     )
                                 ],

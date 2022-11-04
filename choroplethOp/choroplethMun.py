@@ -78,9 +78,10 @@ def pageMun(politicalParties: str, pathData: str, keyToMap: str):
 
     db['% PARTICIPACION'] = db.apply(lambda row: printRow(row), axis=1)
 
-    db.drop('SECCION ELECTORAL', axis=1, inplace=True)
-    db.drop('DISTRITO L', axis=1, inplace=True)
-    db.drop('DISTRITO F', axis=1, inplace=True)
+    db.drop('SECCION ELECTORAL', axis=1, inplace=True, errors='ignore')
+    db.drop('DISTRITO L', axis=1, inplace=True, errors='ignore')
+    db.drop('DISTRITO F', axis=1, inplace=True, errors='ignore')
+    db.drop('% PARTICIPACION CIUDADANA', axis=1, inplace=True, errors='ignore')
     
     politicalPartiesArr = politicalParties.split(',')
 

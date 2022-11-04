@@ -83,8 +83,9 @@ def pageDF(politicalParties: str, pathData: str, keyToMap: str):
 
     db['% PARTICIPACION'] = db.apply(lambda row: printRow(row), axis=1)
 
-    db.drop('SECCION ELECTORAL', axis=1, inplace=True)
-    db.drop('DISTRITO L', axis=1, inplace=True)
+    db.drop('SECCION ELECTORAL', axis=1, inplace=True, errors='ignore')
+    db.drop('DISTRITO L', axis=1, inplace=True, errors='ignore')
+    db.drop('% PARTICIPACION CIUDADANA', axis=1, inplace=True, errors='ignore')
 
     politicalPartiesArr = politicalParties.split(',')
 
@@ -138,12 +139,12 @@ def pageDF(politicalParties: str, pathData: str, keyToMap: str):
                                 ],
                             ),
                             html.Div(
-                                id="geo-map-loading-outer",
+                                id="geo-map-loading-outer2",
                                 children=[
                                     dcc.Loading(
-                                        id="loading",
+                                        id="loading2",
                                         children=dcc.Graph(
-                                            id="geo-map",
+                                            id="geo-map2",
                                             figure=choroplethDF(
                                                 pathData, keyToMap),
                                         ),

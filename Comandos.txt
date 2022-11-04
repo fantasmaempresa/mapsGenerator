@@ -17,6 +17,24 @@ CLAVE MUNICIPIO MUNICIPIO
 16	Teapa
 17	Tenosique
 
+Tipo de Mapa
+--Municipio: Mun
+
+python .\main.py --politicalParties "PRD,PAN,PT,MORENA" --pathData mapas/2017-2018/csv/dip_resumen_general.csv --politicalParty PAN --mapType Mun
+
+--Secciones: Secc
+
+python .\main.py --politicalParties "PRD,PAN,PT,MORENA" --pathData mapas/2017-2018/csv/dip_resumen_general.csv --politicalParty PAN --mapType Secc --municipalityKey 15
+
+--Distrito Federal: DF
+
+python .\main.py --politicalParties "PRD,PAN,PT,MORENA" --pathData mapas/2017-2018/csv/dip_resumen_general.csv --politicalParty PAN --mapType DF
+
+--Distrito Local: DL
+
+python .\main.py --politicalParties "PRD,PAN,PT,MORENA" --pathData mapas/2017-2018/csv/dip_resumen_general.csv --politicalParty PAN --mapType DL
+
+
 
 2020-2021
 ---AYUNTAMIENTO
