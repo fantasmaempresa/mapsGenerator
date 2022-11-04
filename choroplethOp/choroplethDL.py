@@ -6,7 +6,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-from choropleth import printRow, getWinner, politicalPartiesColors, generate_table
+from choropleth import *
 
 
 def choroplethDL(pathData: str, keyToMap: str):
@@ -18,7 +18,7 @@ def choroplethDL(pathData: str, keyToMap: str):
 
     fig = px.choropleth_mapbox(db, geojson=municipalityGeoJson, color=keyToMap,
                                locations='DISTRITO L', featureidkey="properties.distrito_l",
-                               color_continuous_scale="PuRd", mapbox_style="carto-positron",
+                               color_continuous_scale=politicalPartiesRange[keyToMap], mapbox_style="carto-positron",
                                zoom=7, height=800, center={
                                    'lat': 18.028157,
                                    'lon': -92.753621

@@ -15,6 +15,9 @@ mapbox_access_token = 'pk.eyJ1IjoiZXJpY2tuYXZlIiwiYSI6ImNrdDh3MnppbzE2NXIydm5ybW
 politicalPartiesColors = {'PAN': '#00008B ',	'PRI': '#008000',	'PRD': '#FFD700',	'PVEM': '#00FF00',	'PT': '#B22222',
                           'MC': '#D2691E',	'MORENA': '#621132',	'PES': '#8B008B',	'RSP': '#8B0000',	'FPM': '#FF1493', 'NVA_ALIANZA': '#28BBFD'}
 
+politicalPartiesRange = {'PAN': 'Blues',	'PRI': 'Greens',	'PRD': 'solar',	'PVEM': 'YlGN',	'PT': 'YlOrRd',
+                          'MC': 'Oranges',	'MORENA': 'PuRd',	'PES': 'RdPu',	'RSP': 'amp',	'FPM': 'Burg', 'NVA_ALIANZA': 'PuBu'}
+
 
 def createMap():
     municipalityShp = geopandas.read_file("assets/Tabasco/mun.shp")

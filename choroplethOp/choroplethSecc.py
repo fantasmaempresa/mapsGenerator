@@ -24,7 +24,7 @@ def choroplethSecc(pathData: str, keyToMap: str, municipality: int):
 
     fig = px.choropleth_mapbox(db, geojson=municipalityGeoJson, color=keyToMap,
                                locations='SECCION ELECTORAL', featureidkey="properties.seccion",
-                               color_continuous_scale="PuRd", mapbox_style="carto-positron",
+                               color_continuous_scale=politicalPartiesRange[keyToMap], mapbox_style="carto-positron",
                                zoom=7, height=800, center={
                                    'lat': 18.028157,
                                    'lon': -92.753621

@@ -18,7 +18,7 @@ def choroplethDF(pathData: str, keyToMap: str):
 
     fig = px.choropleth_mapbox(db, geojson=municipalityGeoJson, color=keyToMap,
                                locations='DISTRITO F', featureidkey="properties.distrito_f",
-                               color_continuous_scale="PuRd", mapbox_style="carto-positron",
+                               color_continuous_scale=politicalPartiesRange[keyToMap], mapbox_style="carto-positron",
                                zoom=7, height=800, center={
                                    'lat': 18.028157,
                                    'lon': -92.753621
