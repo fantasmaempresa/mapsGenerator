@@ -1,0 +1,8 @@
+# __pycache__ 
+
+__pycache__/
+interactiveMap/__pycache__/
+choroplethOp/__pycache__/
+
+# Secciones
+assets/Tabasco/secc.*
