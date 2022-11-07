@@ -95,11 +95,11 @@ def pageMun(politicalParties: str, pathData: str, keyToMap: str):
             votes.append(row[item])
             parties.append(item)
 
-    finalData = pd.DataFrame({
-        "Partido": parties,
-        "Municipio": district,
-        "Votos": votes
-    })
+        finalData = pd.DataFrame({
+            "Partido": parties,
+            "Municipio": district,
+            "Votos": votes
+        })
 
     fig = px.bar(finalData, x="Municipio", y="Votos",
                  color="Partido", barmode="group",
