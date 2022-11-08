@@ -8,10 +8,10 @@ def getWinner(row, politcParties):
 
     return max(dictWinners, key=dictWinners.get)
 
-def createDataMunicipalities(pathData: str, politicParties):
+def createDataToMap(pathData: str, politicParties, key):
     df = pd.read_csv(pathData)
 
-    db = df.groupby(['MUNICIPIO']).sum(
+    db = df.groupby([key]).sum(
         numeric_only=True).T.T.reset_index()
     
     db['Ganador'] = db.apply(lambda row: getWinner(

@@ -1,6 +1,10 @@
 import pandas as pd
 import geopandas
 
+munGeoJson = 'assets/geoJson/municipalities.geojson'
+dFGeoJson = 'assets/geoJson/federalDistrict.geojson'
+dLGeoJson = 'assets/geoJson/localDistrict.geojson'
+seccGeoJson = 'assets/geoJson/seccion.geojson'
 
 def createAllGeoJson(pathMun: str, pathShp: str):
     data = pd.read_csv(pathMun)
@@ -20,7 +24,7 @@ def createAllGeoJson(pathMun: str, pathShp: str):
             'geometry': geoData
             }
 
-    saveGeoJson(data, 'municipalities.geojson')
+    saveGeoJson(data, munGeoJson)
 
     # FEDERAL DISTRICT
     nameData = []
@@ -35,7 +39,7 @@ def createAllGeoJson(pathMun: str, pathShp: str):
             'geometry': geoData
             }
     
-    saveGeoJson(data, 'federalDistrict.geojson')
+    saveGeoJson(data, dFGeoJson)
 
     # LOCAl DISTRICT
     nameData = []
@@ -50,10 +54,13 @@ def createAllGeoJson(pathMun: str, pathShp: str):
             'geometry': geoData
             }
     
-    saveGeoJson(data, 'localDistrict.geojson')
-
+    saveGeoJson(data, dLGeoJson)
+    
+    # SECCIONES
+    dataShp.query("entidad == 27", inplace=True)
+    dataShp.to_file(seccGeoJson, driver='GeoJSON')
 
 def saveGeoJson(data: dict, fileName: str):
     df_marques = pd.DataFrame(data)
-    municipalityGeoJson = geopandas.GeoDataFrame(df_marques, crs='epsg:4326')
-    municipalityGeoJson.to_file(fileName, driver='GeoJSON')
+    geoJson = geopandas.GeoDataFrame(df_marques, crs='epsg:4326')
+    geoJson.to_file(fileName, driver='GeoJSON')

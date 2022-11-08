@@ -1,10 +1,11 @@
 import pandas as pd
 import plotly.express as px
 
-from interactiveMap.createGeoJson import createAllGeoJson
-from interactiveMap.createData import createDataMunicipalities
+from dash import Dash, html, dcc, Input, Output, dash_table
+
 from interactiveMap.paintMap import paintMap
-from dash import Dash, html, dcc, Input, Output
+from interactiveMap.createGeoJson import *
+from interactiveMap.createData import createDataToMap
 
 app = Dash(__name__)
 pathShp = 'assets/Tabasco/secc.shp'
@@ -64,28 +65,43 @@ def getPoliticPartiesByFile(year: str, candidance_type: str):
             pass
 
         return keys, keys[0:1]
-    
+
     pathData = ''
     return [], []
 
 
 @app.callback(
     Output('comparision_map', 'figure'),
+    Output('table1', 'data'),
+    Output('table1', 'columns'),
     Input('political_parties', 'value'),
     Input('query_type', 'value'),
 )
 def createComparisionMap(political_parties: str, query_type: str):
+    fig = px.choropleth_mapbox()
+    db = pd.DataFrame()
+
     if query_type == 'Municipio':
-        db = createDataMunicipalities(
-            pathData=pathData, politicParties=political_parties)
+        db = createDataToMap(pathData, political_parties, "MUNICIPIO")
+        fig = paintMap(db, munGeoJson, "MUNICIPIO",
+                       "Ganador", "properties.municipio")
 
-        return paintMap(db)
     elif query_type == 'Distrito Local':
-        print('Distrito Local')
+        db = createDataToMap(pathData, political_parties, "DISTRITO L")
+        fig = paintMap(db, dLGeoJson, "DISTRITO L",
+                       "Ganador", "properties.district")
+        
     elif query_type == 'Distrito Federal':
-        print('Distrito Federal')
+        db = createDataToMap(pathData, political_parties, "DISTRITO F")
+        fig = paintMap(db, dFGeoJson, "DISTRITO F",
+                       "Ganador", "properties.district")
+        
+    elif query_type == 'Secciones':
+        db = createDataToMap(pathData, political_parties, "SECCION ELECTORAL")
+        fig = paintMap(db, seccGeoJson, "SECCION ELECTORAL",
+                       "Ganador", "properties.seccion")
 
-    return px.choropleth_mapbox()
+    return fig, db.to_dict('records'), [{"name": i, "id": i} for i in db.columns]
 
 
 def interactive():
@@ -122,6 +138,9 @@ def interactive():
         ]),
         html.Div([
             dcc.Loading(dcc.Graph(id='comparision_map'))
+        ]),
+        html.Div([
+            dcc.Loading(dash_table.DataTable(id='table1', page_size=21))
         ])
     ])
 

@@ -5,11 +5,11 @@ politicalPartiesColors = {'PAN': '#00008B ',	'PRI': '#008000',	'PRD': '#FFD700',
                           'MC': '#D2691E',	'MORENA': '#621132',	'PES': '#8B008B',	'RSP': '#8B0000',	'FPM': '#FF1493', 'NVA_ALIANZA': '#28BBFD'}
 
 
-def paintMap(db):
-    municipalityGeoJson = json.load(open('myJson.geojson', encoding="utf8"))
+def paintMap(db, geoJsonFile, locations, keyToMap, idKey):
+    municipalityGeoJson = json.load(open(geoJsonFile, encoding="utf8"))
 
-    fig = px.choropleth_mapbox(db, geojson=municipalityGeoJson, color="Ganador",
-                               locations="MUNICIPIO", featureidkey="properties.municipio",
+    fig = px.choropleth_mapbox(db, geojson=municipalityGeoJson, color=keyToMap,
+                               locations=locations, featureidkey=idKey,
                                color_continuous_scale="PuRd",
                                color_discrete_map=politicalPartiesColors,
                                mapbox_style="carto-positron", zoom=7, height=800,
