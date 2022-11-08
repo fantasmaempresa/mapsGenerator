@@ -1,12 +1,15 @@
 import pandas as pd
+import plotly.express as px
 
-from interactiveMap.createGeoJson import createGeoJsonDistricts, createGeoJsonMunicipalities
+from interactiveMap.createGeoJson import createAllGeoJson
 from interactiveMap.createData import createDataMunicipalities
+from interactiveMap.paintMap import paintMap
 from dash import Dash, html, dcc, Input, Output
 
 app = Dash(__name__)
 pathShp = 'assets/Tabasco/secc.shp'
 pathMun = 'assets/Tabasco/municipios.csv'
+pathData = ''
 originData = pd.DataFrame({
     "year": ['2017-2018', '2017-2018', '2017-2018', '2020-2021', '2020-2021'],
     "type": ['Ayuntamiento', 'Diputados', 'Gobernatura', 'Ayuntamiento', 'Diputados'],
@@ -34,8 +37,10 @@ def getPoliticPartiesByFile(year: str, candidance_type: str):
         file = originData.query(
             'year == @year and type == @candidance_type')['file'].iloc[0]
 
-        path = 'mapas/' + year + '/csv/' + file
-        data = pd.read_csv(path)
+        global pathData
+        pathData = 'mapas/' + year + '/csv/' + file
+
+        data = pd.read_csv(pathData)
 
         keys = list(data.keys())
         keys.remove('SECCION ELECTORAL')
@@ -59,37 +64,33 @@ def getPoliticPartiesByFile(year: str, candidance_type: str):
             pass
 
         return keys, keys[0:1]
+    
+    pathData = ''
     return [], []
 
 
 @app.callback(
-    Output('comparision_map', 'title'),
-    Input('year', 'value'),
-    Input('candidance_type', 'value'),
+    Output('comparision_map', 'figure'),
     Input('political_parties', 'value'),
     Input('query_type', 'value'),
 )
-def createComparisionMap(year: str, candidance_type: str, political_parties: str, query_type: str):
-    file = originData.query(
-        'year == @year and type == @candidance_type')['file'].iloc[0]
-
-    path = 'mapas/' + year + '/csv/' + file
-
+def createComparisionMap(political_parties: str, query_type: str):
     if query_type == 'Municipio':
-        createGeoJsonMunicipalities(pathMun=pathMun, pathShp=pathShp)
         db = createDataMunicipalities(
-            pathData=path, politicParties=political_parties)
-        
-        print(db)
-    elif query_type == 'Distrito Local':
-        createGeoJsonDistricts(pathShp=pathShp, districtType=2)
-    elif query_type == 'Distrito Federal':
-        createGeoJsonDistricts(pathShp=pathShp, districtType=1)
+            pathData=pathData, politicParties=political_parties)
 
-    return ''
+        return paintMap(db)
+    elif query_type == 'Distrito Local':
+        print('Distrito Local')
+    elif query_type == 'Distrito Federal':
+        print('Distrito Federal')
+
+    return px.choropleth_mapbox()
 
 
 def interactive():
+    createAllGeoJson(pathMun, pathShp)
+
     app.layout = html.Div([
         html.Div([
             html.Div([
@@ -120,7 +121,7 @@ def interactive():
             dcc.Checklist(id='political_parties', inline=False)
         ]),
         html.Div([
-            dcc.Loading(html.P(':v', id='comparision_map'))
+            dcc.Loading(dcc.Graph(id='comparision_map'))
         ])
     ])
 

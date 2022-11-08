@@ -14,7 +14,7 @@ def createDataMunicipalities(pathData: str, politicParties):
     db = df.groupby(['MUNICIPIO']).sum(
         numeric_only=True).T.T.reset_index()
     
-    db['WINNER'] = db.apply(lambda row: getWinner(
+    db['Ganador'] = db.apply(lambda row: getWinner(
         row, politicParties), axis=1)
     
     return db
