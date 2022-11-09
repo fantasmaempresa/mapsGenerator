@@ -5,7 +5,7 @@ from dash import Dash, html, dcc, Input, Output, dash_table
 
 from interactiveMap.paintMap import paintMap
 from interactiveMap.createGeoJson import *
-from interactiveMap.createData import createDataToMap
+from interactiveMap.createData import createDataToMap, createDataToTable
 
 app = Dash(__name__)
 pathShp = 'assets/Tabasco/secc.shp'
@@ -16,6 +16,8 @@ originData = pd.DataFrame({
     "type": ['Ayuntamiento', 'Diputados', 'Gobernatura', 'Ayuntamiento', 'Diputados'],
     "file": ['ayu_general_casillas.csv', 'dip_resumen_general.csv', 'gub_resumen_general.csv', 'ayu_resumen_general.csv', 'dip_resumen_general.csv']
 })
+
+dataBase = pd.DataFrame()
 
 
 @app.callback(
@@ -30,15 +32,16 @@ def filterByYearData(year: str):
 @app.callback(
     Output('political_parties', 'options'),
     Output('political_parties', 'value'),
+    Output('query_type', 'value'),
     Input('year', 'value'),
     Input('candidance_type', 'value'),
 )
 def getPoliticPartiesByFile(year: str, candidance_type: str):
-    if candidance_type != '':
+    global pathData
+    if candidance_type != '' and candidance_type != None:
         file = originData.query(
             'year == @year and type == @candidance_type')['file'].iloc[0]
 
-        global pathData
         pathData = 'mapas/' + year + '/csv/' + file
 
         data = pd.read_csv(pathData)
@@ -64,44 +67,69 @@ def getPoliticPartiesByFile(year: str, candidance_type: str):
         except ValueError:
             pass
 
-        return keys, keys[0:1]
+        return keys, keys[0:1], ''
 
     pathData = ''
-    return [], []
+    return [], [],''
 
 
 @app.callback(
     Output('comparision_map', 'figure'),
-    Output('table1', 'data'),
-    Output('table1', 'columns'),
     Input('political_parties', 'value'),
     Input('query_type', 'value'),
 )
-def createComparisionMap(political_parties: str, query_type: str):
+def createComparisionMap(political_parties, query_type: str):
     fig = px.choropleth_mapbox()
+
+    if political_parties and query_type != '' and query_type != None:
+        if query_type == 'Municipio':
+            db = createDataToMap(pathData, political_parties, "MUNICIPIO")
+            fig = paintMap(db, munGeoJson, "MUNICIPIO",
+                           "Ganador", "properties.municipio")
+
+        elif query_type == 'Distrito Local':
+            db = createDataToMap(pathData, political_parties, "DISTRITO L")
+            fig = paintMap(db, dLGeoJson, "DISTRITO L",
+                           "Ganador", "properties.district")
+
+        elif query_type == 'Distrito Federal':
+            db = createDataToMap(pathData, political_parties, "DISTRITO F")
+            fig = paintMap(db, dFGeoJson, "DISTRITO F",
+                           "Ganador", "properties.district")
+
+        elif query_type == 'Secciones':
+            db = createDataToMap(
+                pathData, political_parties, "SECCION ELECTORAL")
+            fig = paintMap(db, seccGeoJson, "SECCION ELECTORAL",
+                           "Ganador", "properties.seccion")
+
+    return fig
+
+
+@app.callback([
+    Output('table1', 'data'),
+    Output('table1', 'columns'),
+    Input('query_type', 'value')
+])
+def createTable(query_type: str):
     db = pd.DataFrame()
 
-    if query_type == 'Municipio':
-        db = createDataToMap(pathData, political_parties, "MUNICIPIO")
-        fig = paintMap(db, munGeoJson, "MUNICIPIO",
-                       "Ganador", "properties.municipio")
+    print(query_type)
+    if query_type != '':
+        if query_type == 'Municipio':
+            db = createDataToTable(pathData, "MUNICIPIO")
 
-    elif query_type == 'Distrito Local':
-        db = createDataToMap(pathData, political_parties, "DISTRITO L")
-        fig = paintMap(db, dLGeoJson, "DISTRITO L",
-                       "Ganador", "properties.district")
-        
-    elif query_type == 'Distrito Federal':
-        db = createDataToMap(pathData, political_parties, "DISTRITO F")
-        fig = paintMap(db, dFGeoJson, "DISTRITO F",
-                       "Ganador", "properties.district")
-        
-    elif query_type == 'Secciones':
-        db = createDataToMap(pathData, political_parties, "SECCION ELECTORAL")
-        fig = paintMap(db, seccGeoJson, "SECCION ELECTORAL",
-                       "Ganador", "properties.seccion")
+        elif query_type == 'Distrito Local':
+            db = createDataToTable(pathData, "DISTRITO L")
 
-    return fig, db.to_dict('records'), [{"name": i, "id": i} for i in db.columns]
+        elif query_type == 'Distrito Federal':
+            db = createDataToTable(pathData, "DISTRITO F")
+
+        elif query_type == 'Secciones':
+            db = createDataToTable(
+                pathData,  "SECCION ELECTORAL")
+
+    return db.to_dict('records'), [{"name": i, "id": i} for i in db.columns]
 
 
 def interactive():
@@ -137,8 +165,10 @@ def interactive():
             dcc.Checklist(id='political_parties', inline=False)
         ]),
         html.Div([
-            dcc.Loading(dcc.Graph(id='comparision_map'))
-        ]),
+            html.Div([
+                dcc.Loading(dcc.Graph(id='comparision_map'))
+            ], style={'padding': 10, 'flex': 1}),
+        ], style={'display': 'flex', 'flex-direction': 'row'}),
         html.Div([
             dcc.Loading(dash_table.DataTable(id='table1', page_size=21))
         ])
