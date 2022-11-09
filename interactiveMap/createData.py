@@ -17,7 +17,7 @@ def createDataToMap(pathData: str, politicParties, key):
     db = df.groupby([key]).sum(
         numeric_only=True).T.T.reset_index()
     
-    db['Ganador'] = db.apply(lambda row: getWinner(
+    db['GANADOR'] = db.apply(lambda row: getWinner(
         row, politicParties), axis=1)
 
     return db

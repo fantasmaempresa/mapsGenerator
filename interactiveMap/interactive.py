@@ -1,5 +1,6 @@
 import pandas as pd
 import plotly.express as px
+import dash_bootstrap_components as dbc
 
 from dash import Dash, html, dcc, Input, Output, dash_table
 
@@ -7,7 +8,7 @@ from interactiveMap.paintMap import paintMap
 from interactiveMap.createGeoJson import *
 from interactiveMap.createData import createDataToMap, createDataToTable
 
-app = Dash(__name__)
+app = Dash(external_stylesheets=[dbc.themes.SOLAR])
 pathShp = 'assets/Tabasco/secc.shp'
 pathMun = 'assets/Tabasco/municipios.csv'
 pathData = ''
@@ -33,6 +34,8 @@ def filterByYearData(year: str):
     Output('political_parties', 'options'),
     Output('political_parties', 'value'),
     Output('query_type', 'value'),
+    Output('political_parties_range', 'options'),
+    Output('political_parties_range', 'value'),
     Input('year', 'value'),
     Input('candidance_type', 'value'),
 )
@@ -67,10 +70,10 @@ def getPoliticPartiesByFile(year: str, candidance_type: str):
         except ValueError:
             pass
 
-        return keys, keys[0:1], ''
+        return [{"label": i, "value": i} for i in keys], keys[0:1], '', [{"label": i, "value": i} for i in keys], keys[0]
 
     pathData = ''
-    return [], [],''
+    return [], [], '', [], ''
 
 
 @app.callback(
@@ -85,23 +88,56 @@ def createComparisionMap(political_parties, query_type: str):
         if query_type == 'Municipio':
             db = createDataToMap(pathData, political_parties, "MUNICIPIO")
             fig = paintMap(db, munGeoJson, "MUNICIPIO",
-                           "Ganador", "properties.municipio")
+                           "GANADOR", "properties.municipio")
 
         elif query_type == 'Distrito Local':
             db = createDataToMap(pathData, political_parties, "DISTRITO L")
             fig = paintMap(db, dLGeoJson, "DISTRITO L",
-                           "Ganador", "properties.district")
+                           "GANADOR", "properties.district")
 
         elif query_type == 'Distrito Federal':
             db = createDataToMap(pathData, political_parties, "DISTRITO F")
             fig = paintMap(db, dFGeoJson, "DISTRITO F",
-                           "Ganador", "properties.district")
+                           "GANADOR", "properties.district")
 
         elif query_type == 'Secciones':
             db = createDataToMap(
                 pathData, political_parties, "SECCION ELECTORAL")
             fig = paintMap(db, seccGeoJson, "SECCION ELECTORAL",
-                           "Ganador", "properties.seccion")
+                           "GANADOR", "properties.seccion")
+
+    return fig
+
+
+@app.callback(
+    Output('range_map', 'figure'),
+    Input('political_parties_range', 'value'),
+    Input('query_type', 'value'),
+)
+def createRangeMap(politicalParty, queryType):
+    fig = px.choropleth_mapbox()
+
+    if politicalParty != '' and queryType != '' and queryType != None:
+        if queryType == 'Municipio':
+            db = createDataToMap(pathData, [politicalParty], "MUNICIPIO")
+            fig = paintMap(db, munGeoJson, "MUNICIPIO",
+                           politicalParty, "properties.municipio")
+
+        elif queryType == 'Distrito Local':
+            db = createDataToMap(pathData, [politicalParty], "DISTRITO L")
+            fig = paintMap(db, dLGeoJson, "DISTRITO L",
+                           politicalParty, "properties.district")
+
+        elif queryType == 'Distrito Federal':
+            db = createDataToMap(pathData, [politicalParty], "DISTRITO F")
+            fig = paintMap(db, dFGeoJson, "DISTRITO F",
+                           politicalParty, "properties.district")
+
+        elif queryType == 'Secciones':
+            db = createDataToMap(
+                pathData, [politicalParty], "SECCION ELECTORAL")
+            fig = paintMap(db, seccGeoJson, "SECCION ELECTORAL",
+                           politicalParty, "properties.seccion")
 
     return fig
 
@@ -114,7 +150,6 @@ def createComparisionMap(political_parties, query_type: str):
 def createTable(query_type: str):
     db = pd.DataFrame()
 
-    print(query_type)
     if query_type != '':
         if query_type == 'Municipio':
             db = createDataToTable(pathData, "MUNICIPIO")
@@ -136,42 +171,67 @@ def interactive():
     createAllGeoJson(pathMun, pathShp)
 
     app.layout = html.Div([
-        html.Div([
-            html.Div([
-                html.P("Año de Consulta"),
-                dcc.Dropdown(
-                    originData['year'].unique(),
-                    '0',
-                    id='year'
-                )
-            ], style={'width': '30%', 'display': 'inline-block'}),
-            html.Div([
-                html.P("Tipo Candidatura"),
-                dcc.Dropdown(
-                    id='candidance_type',
-                    value=''
-                ),
-            ], style={'width': '30%', 'display': 'inline-block'}),
-            html.Div([
-                html.P("Tipo Consulta"),
-                dcc.Dropdown(
-                    ['Distrito Local', 'Distrito Federal', 'Municipio', 'Secciones'],
-                    id='query_type',
-                    value=''
-                ),
-            ], style={'width': '30%', 'display': 'inline-block'}),
-        ]),
-        html.Div([
-            dcc.Checklist(id='political_parties', inline=False)
-        ]),
-        html.Div([
-            html.Div([
-                dcc.Loading(dcc.Graph(id='comparision_map'))
-            ], style={'padding': 10, 'flex': 1}),
-        ], style={'display': 'flex', 'flex-direction': 'row'}),
-        html.Div([
-            dcc.Loading(dash_table.DataTable(id='table1', page_size=21))
-        ])
+        dbc.Card(
+            dbc.CardBody([
+                dbc.Row([
+                    dbc.Col([
+                        html.Div([
+                            html.P("Año de Consulta"),
+                            dcc.Dropdown(
+                                originData['year'].unique(),
+                                '0',
+                                id='year'
+                            )])
+                    ]),
+                    dbc.Col([
+                        html.Div([
+                            html.P("Tipo Candidatura"),
+                            dcc.Dropdown(
+                                id='candidance_type',
+                                value=''
+                            )
+                        ])
+                    ]),
+                    dbc.Col([
+                        html.Div([
+                            html.P("Tipo Consulta"),
+                            dcc.Dropdown(
+                                ['Distrito Local', 'Distrito Federal',
+                                 'Municipio', 'Secciones'],
+                                id='query_type',
+                                value=''
+                            )
+                        ])
+                    ]),
+                ], align='center')
+            ]),
+            style={'margin': '30px'}
+        ),
+        dbc.Card(
+            dbc.CardBody([
+                dbc.Row([
+                    dbc.Checklist(id='political_parties', inline=True),
+                    dcc.Loading(dcc.Graph(id='comparision_map'))
+                ])
+            ]),
+            style={'margin': '30px'}
+        ),
+        dbc.Card(
+            dbc.CardBody(
+                dcc.Loading(dash_table.DataTable(
+                    id='table1', page_size=21, style_table={'overflowX': 'auto'}))
+            ),
+            style={'margin': '30px'}
+        ),
+        dbc.Card(
+            dbc.CardBody([
+                dbc.Row([
+                    dbc.RadioItems(id='political_parties_range', inline=True),
+                    dcc.Loading(dcc.Graph(id='range_map'))
+                ])
+            ]),
+            style={'margin': '30px'}
+        )
     ])
 
     app.run_server(debug=True)
