@@ -4,7 +4,7 @@ import dash_bootstrap_components as dbc
 
 from dash import Dash, html, dcc, Input, Output, dash_table
 
-from interactiveMap.paintMap import paintMap
+from interactiveMap.paintMap import paintMap, createGraphicBar
 from interactiveMap.createGeoJson import *
 from interactiveMap.createData import createDataToMap, createDataToTable
 
@@ -27,7 +27,7 @@ dataBase = pd.DataFrame()
     Input('year', 'value')
 )
 def filterByYearData(year: str):
-    return originData.query('year == @year')['type'], ''
+    return [{"label": i, "value": i} for i in originData.query('year == @year')['type']], ''
 
 
 @app.callback(
@@ -36,6 +36,8 @@ def filterByYearData(year: str):
     Output('query_type', 'value'),
     Output('political_parties_range', 'options'),
     Output('political_parties_range', 'value'),
+    Output('political_parties_bar', 'options'),
+    Output('political_parties_bar', 'value'),
     Input('year', 'value'),
     Input('candidance_type', 'value'),
 )
@@ -70,10 +72,12 @@ def getPoliticPartiesByFile(year: str, candidance_type: str):
         except ValueError:
             pass
 
-        return [{"label": i, "value": i} for i in keys], keys[0:1], '', [{"label": i, "value": i} for i in keys], keys[0]
+        ppDict = [{"label": i, "value": i} for i in keys] 
+
+        return ppDict, keys[0:1], '', ppDict, keys[0] , ppDict, keys[0:1]
 
     pathData = ''
-    return [], [], '', [], ''
+    return [], [], '', [], '', [], ''
 
 
 @app.callback(
@@ -166,6 +170,33 @@ def createTable(query_type: str):
 
     return db.to_dict('records'), [{"name": i, "id": i} for i in db.columns]
 
+@app.callback(
+    Output('bar', 'figure'),
+    Input('political_parties_bar', 'value'),
+    Input('query_type', 'value'),
+)
+def createGrafic(politicalParties, queryType: str):
+    fig = px.choropleth_mapbox()
+
+    if politicalParties and queryType != '' and queryType != None:
+        if queryType == 'Municipio':
+            db = createDataToMap(pathData, politicalParties, "MUNICIPIO")
+            fig = createGraphicBar(db, politicalParties, "MUNICIPIO")
+
+        elif queryType == 'Distrito Local':
+            db = createDataToMap(pathData, politicalParties, "DISTRITO L")
+            fig = createGraphicBar(db, politicalParties, "DISTRITO L")
+
+        elif queryType == 'Distrito Federal':
+            db = createDataToMap(pathData, politicalParties, "DISTRITO F")
+            fig = createGraphicBar(db, politicalParties, "DISTRITO F")
+
+        elif queryType == 'Secciones':
+            db = createDataToMap(
+                pathData, politicalParties, "SECCION ELECTORAL")
+            fig = createGraphicBar(db, politicalParties, "SECCION ELECTORAL")
+
+    return fig
 
 def interactive():
     createAllGeoJson(pathMun, pathShp)
@@ -177,16 +208,16 @@ def interactive():
                     dbc.Col([
                         html.Div([
                             html.P("Año de Consulta"),
-                            dcc.Dropdown(
-                                originData['year'].unique(),
-                                '0',
-                                id='year'
+                            dbc.Select(
+                                id='year',
+                                options=[{"label": i, "value": i}
+                                         for i in originData['year'].unique()],
                             )])
                     ]),
                     dbc.Col([
                         html.Div([
                             html.P("Tipo Candidatura"),
-                            dcc.Dropdown(
+                            dbc.Select(
                                 id='candidance_type',
                                 value=''
                             )
@@ -195,11 +226,11 @@ def interactive():
                     dbc.Col([
                         html.Div([
                             html.P("Tipo Consulta"),
-                            dcc.Dropdown(
-                                ['Distrito Local', 'Distrito Federal',
-                                 'Municipio', 'Secciones'],
+                            dbc.Select(
                                 id='query_type',
-                                value=''
+                                options=[{"label": "Distrito Local", "value": "Distrito Local"}, {
+                                    "label": "Distrito Federal", "value": "Distrito Federal"}, {"label": "Municipio", "value": "Municipio"},
+                                    {"label": "Secciones", "value": "Secciones"}]
                             )
                         ])
                     ]),
@@ -228,6 +259,15 @@ def interactive():
                 dbc.Row([
                     dbc.RadioItems(id='political_parties_range', inline=True),
                     dcc.Loading(dcc.Graph(id='range_map'))
+                ])
+            ]),
+            style={'margin': '30px'}
+        ),
+         dbc.Card(
+            dbc.CardBody([
+                dbc.Row([
+                    dbc.Checklist(id='political_parties_bar', inline=True),
+                    dcc.Loading(dcc.Graph(id='bar'))
                 ])
             ]),
             style={'margin': '30px'}

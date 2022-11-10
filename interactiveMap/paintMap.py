@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 import plotly.express as px
 
 politicalPartiesColors = {'PAN': '#00008B ',	'PRI': '#008000',	'PRD': '#FFD700',	'PVEM': '#00FF00',	'PT': '#B22222',
@@ -32,4 +33,26 @@ def paintMap(db, geoJsonFile, locations, keyToMap, idKey):
         
 
 
+    return fig
+
+def createGraphicBar(db, politicalParties, type):
+    votes = []
+    district = []
+    parties = []
+
+    for index, row in db.iterrows():
+        for item in politicalParties:
+            district.append(row[type])
+            votes.append(row[item])
+            parties.append(item)
+
+        finalData = pd.DataFrame({
+            "Partido": parties,
+            type: district,
+            "Votos": votes
+        })
+
+    fig = px.bar(finalData, x=type, y="Votos",
+                 color="Partido", barmode="group",
+                 color_discrete_map=politicalPartiesColors, height=700)
     return fig
