@@ -6,7 +6,7 @@ from dash import Dash, html, dcc, Input, Output, dash_table
 
 from interactiveMap.paintMap import paintMap, createGraphicBar
 from interactiveMap.createGeoJson import *
-from interactiveMap.createData import createDataToMap, createDataToTable
+from interactiveMap.createData import createDataToMap, createDataToTable, createDataTableRG
 
 app = Dash(external_stylesheets=[dbc.themes.SOLAR])
 pathShp = 'assets/Tabasco/secc.shp'
@@ -170,6 +170,31 @@ def createTable(query_type: str):
 
     return db.to_dict('records'), [{"name": i, "id": i} for i in db.columns]
 
+@app.callback([
+    Output('table2', 'data'),
+    Output('table2', 'columns'),
+    Input('query_type', 'value')
+])
+def createTable2(query_type: str):
+    db = pd.DataFrame()
+
+    if query_type != '':
+        if query_type == 'Municipio':
+            db = createDataTableRG(pathData, "MUNICIPIO")
+
+        elif query_type == 'Distrito Local':
+            db = createDataTableRG(pathData, "DISTRITO L")
+
+        elif query_type == 'Distrito Federal':
+            db = createDataTableRG(pathData, "DISTRITO F")
+
+        elif query_type == 'Secciones':
+            db = createDataTableRG(
+                pathData,  "SECCION ELECTORAL")
+
+    return db.to_dict('records'), [{"name": i, "id": i} for i in db.columns]
+
+
 @app.callback(
     Output('bar', 'figure'),
     Input('political_parties_bar', 'value'),
@@ -207,7 +232,7 @@ def interactive():
                 dbc.Row([
                     dbc.Col([
                         html.Div([
-                            html.P("Año de Consulta"),
+                            dbc.Label("Año de Consulta"),
                             dbc.Select(
                                 id='year',
                                 options=[{"label": i, "value": i}
@@ -216,7 +241,7 @@ def interactive():
                     ]),
                     dbc.Col([
                         html.Div([
-                            html.P("Tipo Candidatura"),
+                            dbc.Label("Tipo Candidatura"),
                             dbc.Select(
                                 id='candidance_type',
                                 value=''
@@ -225,7 +250,7 @@ def interactive():
                     ]),
                     dbc.Col([
                         html.Div([
-                            html.P("Tipo Consulta"),
+                            dbc.Label("Tipo Consulta"),
                             dbc.Select(
                                 id='query_type',
                                 options=[{"label": "Distrito Local", "value": "Distrito Local"}, {
@@ -263,7 +288,7 @@ def interactive():
             ]),
             style={'margin': '30px'}
         ),
-         dbc.Card(
+        dbc.Card(
             dbc.CardBody([
                 dbc.Row([
                     dbc.Checklist(id='political_parties_bar', inline=True),
@@ -271,7 +296,14 @@ def interactive():
                 ])
             ]),
             style={'margin': '30px'}
-        )
+        ),
+        dbc.Card(
+            dbc.CardBody(
+                dcc.Loading(dash_table.DataTable(
+                    id='table2', page_size=21, style_table={'overflowX': 'auto'}))
+            ),
+            style={'margin': '30px'}
+        ),
     ])
 
     app.run_server(debug=True)
