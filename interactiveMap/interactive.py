@@ -72,9 +72,9 @@ def getPoliticPartiesByFile(year: str, candidance_type: str):
         except ValueError:
             pass
 
-        ppDict = [{"label": i, "value": i} for i in keys] 
+        ppDict = [{"label": i, "value": i} for i in keys]
 
-        return ppDict, keys[0:1], '', ppDict, keys[0] , ppDict, keys[0:1]
+        return ppDict, keys[0:1], '', ppDict, keys[0], ppDict, keys[0:1]
 
     pathData = ''
     return [], [], '', [], '', [], ''
@@ -170,6 +170,7 @@ def createTable(query_type: str):
 
     return db.to_dict('records'), [{"name": i, "id": i} for i in db.columns]
 
+
 @app.callback([
     Output('table2', 'data'),
     Output('table2', 'columns'),
@@ -222,6 +223,7 @@ def createGrafic(politicalParties, queryType: str):
             fig = createGraphicBar(db, politicalParties, "SECCION ELECTORAL")
 
     return fig
+
 
 def interactive():
     createAllGeoJson(pathMun, pathShp)
@@ -302,6 +304,21 @@ def interactive():
                 dcc.Loading(dash_table.DataTable(
                     id='table2', page_size=21, style_table={'overflowX': 'auto'}))
             ),
+            style={'margin': '30px'}
+        ),
+        dbc.Card(
+            dbc.CardBody([
+                dbc.Row([
+                    html.Div([
+                        dbc.Label("Grupo 1"),
+                        dcc.Dropdown(['A','B','C','D'], multi=True)
+                    ]),
+                    html.Div([
+                        dbc.Label("Grupo 2"),
+                        dcc.Dropdown(['A','B','C','D'], multi=True)
+                    ])
+                ], align='center')
+            ]),
             style={'margin': '30px'}
         ),
     ])
