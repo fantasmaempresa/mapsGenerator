@@ -6,7 +6,7 @@ from dash import Dash, html, dcc, Input, Output, dash_table
 
 from interactiveMap.paintMap import paintMap, createGraphicBar
 from interactiveMap.createGeoJson import *
-from interactiveMap.createData import createDataToMap, createDataToTable, createDataTableRG
+from interactiveMap.createData import createDataToMap, createDataToTable, createDataTableRG, createDataToVS
 
 app = Dash(external_stylesheets=[dbc.themes.SOLAR])
 pathShp = 'assets/Tabasco/secc.shp'
@@ -38,6 +38,10 @@ def filterByYearData(year: str):
     Output('political_parties_range', 'value'),
     Output('political_parties_bar', 'options'),
     Output('political_parties_bar', 'value'),
+    Output('political_parties_g1', 'options'),
+    Output('political_parties_g1', 'value'),
+    Output('political_parties_g2', 'options'),
+    Output('political_parties_g2', 'value'),
     Input('year', 'value'),
     Input('candidance_type', 'value'),
 )
@@ -74,10 +78,10 @@ def getPoliticPartiesByFile(year: str, candidance_type: str):
 
         ppDict = [{"label": i, "value": i} for i in keys]
 
-        return ppDict, keys[0:1], '', ppDict, keys[0], ppDict, keys[0:1]
+        return ppDict, keys[0:1], '', ppDict, keys[0], ppDict, keys[0:1], keys, keys[0:1], keys, keys[0:1]
 
     pathData = ''
-    return [], [], '', [], '', [], ''
+    return [], [], '', [], '', [], '', [], '', [], ''
 
 
 @app.callback(
@@ -225,6 +229,47 @@ def createGrafic(politicalParties, queryType: str):
     return fig
 
 
+@app.callback(
+    Output('versus_map', 'figure'),
+    Output('table3', 'data'),
+    Output('table3', 'columns'),
+    Input('political_parties_g1', 'value'),
+    Input('political_parties_g2', 'value'),
+    Input('query_type', 'value'),
+)
+def createMapVs(politicalPartiesG1, politicalPartiesG2, queryType):
+    fig = px.choropleth_mapbox()
+    db = pd.DataFrame()
+
+    if politicalPartiesG1 and politicalPartiesG2 and queryType != '' and queryType != None:
+
+        if queryType == 'Municipio':
+            db = createDataToVS(
+                pathData, politicalPartiesG1, politicalPartiesG2, "MUNICIPIO")
+            fig = paintMap(db, munGeoJson, "MUNICIPIO",
+                           "GANADOR", "properties.municipio")
+
+        elif queryType == 'Distrito Local':
+            db = createDataToVS(pathData, politicalPartiesG1,
+                                politicalPartiesG2, "DISTRITO L")
+            fig = paintMap(db, dLGeoJson, "DISTRITO L",
+                           "GANADOR", "properties.district")
+
+        elif queryType == 'Distrito Federal':
+            db = createDataToVS(pathData, politicalPartiesG1,
+                                politicalPartiesG2, "DISTRITO F")
+            fig = paintMap(db, dFGeoJson, "DISTRITO F",
+                           "GANADOR", "properties.district")
+
+        elif queryType == 'Secciones':
+            db = createDataToVS(pathData, politicalPartiesG1,
+                                politicalPartiesG2, "SECCION ELECTORAL")
+            fig = paintMap(db, seccGeoJson, "SECCION ELECTORAL",
+                           "GANADOR", "properties.seccion")
+
+    return fig, db.to_dict('records'), [{"name": i, "id": i} for i in db.columns]
+
+
 def interactive():
     createAllGeoJson(pathMun, pathShp)
 
@@ -309,14 +354,18 @@ def interactive():
         dbc.Card(
             dbc.CardBody([
                 dbc.Row([
-                    html.Div([
+                    dbc.Col(html.Div([
                         dbc.Label("Grupo 1"),
-                        dcc.Dropdown(['A','B','C','D'], multi=True)
-                    ]),
-                    html.Div([
+                        dcc.Dropdown(id='political_parties_g1', multi=True)
+                    ])),
+                    dbc.Col(html.Div([
                         dbc.Label("Grupo 2"),
-                        dcc.Dropdown(['A','B','C','D'], multi=True)
-                    ])
+                        dcc.Dropdown(id='political_parties_g2', multi=True)
+                    ])),
+                    dcc.Loading(dcc.Graph(id='versus_map',
+                                style={'margin': '20px'})),
+                    dcc.Loading(dash_table.DataTable(
+                        id='table3', page_size=21, style_table={'overflowX': 'auto'}))
                 ], align='center')
             ]),
             style={'margin': '30px'}

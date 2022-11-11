@@ -30,6 +30,13 @@ def searchMunicipality(row, dbSecc):
     
     return filter.iloc[0]['MUNICIPIO']
 
+def sumPoliticParties(row, politicalParties):
+    sum = 0
+    for item in politicalParties:
+        sum = sum + row[item]
+    
+    return sum
+
 def createDataToMap(pathData: str, politicParties, key):
     df = pd.read_csv(pathData)
 
@@ -86,3 +93,16 @@ def createDataTableRG(pathData, key):
         numeric_only=True).T.T.reset_index()
     
     return db[[key,'No Propietarios', 'No Suplentes', 'No RGS']]
+
+def createDataToVS(pathData, politicalPartiesG1, politicalPartiesG2, key):
+    df = pd.read_csv(pathData)
+
+    db = df.groupby([key]).sum(
+        numeric_only=True).T.T.reset_index()
+
+    db['_'.join(politicalPartiesG1)] = db.apply(lambda x: sumPoliticParties(x, politicalPartiesG1), axis=1)
+    db['_'.join(politicalPartiesG2)] = db.apply(lambda x: sumPoliticParties(x, politicalPartiesG2), axis=1)
+
+    db['GANADOR'] = db.apply(lambda row: getWinner(row, ['_'.join(politicalPartiesG1), '_'.join(politicalPartiesG2)]), axis=1)
+
+    return db[[key, '_'.join(politicalPartiesG1), '_'.join(politicalPartiesG2), 'GANADOR']]
