@@ -111,9 +111,12 @@ def createDataTableRG(pathData, key):
     db['DISTRITO F'] = db.apply(
         lambda row: row['DISTRITO F']/row['No Suplentes'], axis=1)
 
-    db['MIXTO'] = db.apply(lambda row: searchTypeName(row, dbSecc,'MIXTO'), axis=1)
-    db['URBANO'] = db.apply(lambda row: searchTypeName(row, dbSecc,'URBANO'), axis=1)
-    db['RURAL'] = db.apply(lambda row: searchTypeName(row, dbSecc,'RURAL'), axis=1)
+    db['MIXTO'] = db.apply(lambda row: searchTypeName(
+        row, dbSecc, 'MIXTO'), axis=1)
+    db['URBANO'] = db.apply(lambda row: searchTypeName(
+        row, dbSecc, 'URBANO'), axis=1)
+    db['RURAL'] = db.apply(lambda row: searchTypeName(
+        row, dbSecc, 'RURAL'), axis=1)
 
     db = db.groupby([key]).sum(
         numeric_only=True).T.T.reset_index()
@@ -136,3 +139,25 @@ def createDataToVS(pathData, politicalPartiesG1, politicalPartiesG2, key):
         row, ['_'.join(politicalPartiesG1), '_'.join(politicalPartiesG2)]), axis=1)
 
     return db[[key, '_'.join(politicalPartiesG1), '_'.join(politicalPartiesG2), 'GANADOR']]
+
+
+def createDataClassification(pathData, key):
+    df = pd.read_csv(pathData)
+
+    db = df.groupby([key]).sum(
+        numeric_only=True).T.T.reset_index()
+
+    db.drop('SECCION ELECTORAL', inplace=True, axis=1, errors='ignore')
+    db.drop('MUNICIPIO', inplace=True, axis=1, errors='ignore')
+    db.drop('NUMERO DE VOTOS VALIDOS', inplace=True, axis=1, errors='ignore')
+    db.drop('TOTAL DE VOTOS', inplace=True, axis=1, errors='ignore')
+    db.drop('LISTA NOMINAL', inplace=True, axis=1, errors='ignore')
+    db.drop('% PARTICIPACION CIUDADANA', inplace=True, axis=1, errors='ignore')
+    db.drop('DISTRITO F', inplace=True, axis=1, errors='ignore')
+    db.drop('DISTRITO L', inplace=True, axis=1, errors='ignore')
+    db.drop('CASILLA', inplace=True, axis=1, errors='ignore')
+    
+    db['TOTAL'] = db.mean(axis=1)
+    db.sort_values(by=['TOTAL'], inplace=True)
+    
+    return db

@@ -6,7 +6,11 @@ politicalPartiesColors = {'PAN': '#00008B ',	'PRI': '#008000',	'PRD': '#FFD700',
                           'MC': '#D2691E',	'MORENA': '#621132',	'PES': '#8B008B',	'RSP': '#8B0000',	'FPM': '#FF1493', 'NVA_ALIANZA': '#28BBFD'}
 
 politicalPartiesRange = {'PAN': 'Blues',	'PRI': 'Greens',	'PRD': 'solar',	'PVEM': 'YlGN',	'PT': 'YlOrRd',
-                         'MC': 'Oranges',	'MORENA': 'PuRd',	'PES': 'RdPu',	'RSP': 'amp',	'FPM': 'Burg', 'NVA_ALIANZA': 'PuBu'}
+                         'MC': 'Oranges',	'MORENA': 'PuRd',	'PES': 'RdPu',	'RSP': 'amp',	'FPM': 'Burg', 'NVA_ALIANZA': 'PuBu',
+                         'PAN_PRD_MC':'aggrnyl', 'PAN_MC':'agsunset', 'PAN_MC': 'bluered', 'PRD_MC':'blugrn',
+                         'PT_MORENA': 'brwnyl',
+                         'PAN,PRD Y MC':'gnbu', 'PAN Y PRD': 'greys', 'PAN Y MC': 'magenta', 'PRD Y MC': 'magma',
+                         'PT,MORENA Y ES': 'pubu', 'PT Y MORENA': 'pubugn', 'PT Y ES': 'purd', 'MORENA Y ES': 'purp'}
 
 
 def paintMap(db, geoJsonFile, locations, keyToMap, idKey):

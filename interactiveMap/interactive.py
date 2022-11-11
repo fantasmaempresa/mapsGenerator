@@ -6,7 +6,7 @@ from dash import Dash, html, dcc, Input, Output, dash_table
 
 from interactiveMap.paintMap import paintMap, createGraphicBar
 from interactiveMap.createGeoJson import *
-from interactiveMap.createData import createDataToMap, createDataToTable, createDataTableRG, createDataToVS
+from interactiveMap.createData import *
 
 app = Dash(external_stylesheets=[dbc.themes.SOLAR])
 pathShp = 'assets/Tabasco/secc.shp'
@@ -270,6 +270,30 @@ def createMapVs(politicalPartiesG1, politicalPartiesG2, queryType):
     return fig, db.to_dict('records'), [{"name": i, "id": i} for i in db.columns]
 
 
+@app.callback([
+    Output('table4', 'data'),
+    Output('table4', 'columns'),
+    Input('query_type', 'value')
+])
+def createTable4(query_type: str):
+    db = pd.DataFrame()
+
+    if query_type != '':
+        if query_type == 'Municipio':
+            db = createDataClassification(pathData, "MUNICIPIO")
+
+        elif query_type == 'Distrito Local':
+            db = createDataClassification(pathData, "DISTRITO L")
+
+        elif query_type == 'Distrito Federal':
+            db = createDataClassification(pathData, "DISTRITO F")
+
+        elif query_type == 'Secciones':
+            db = createDataClassification(pathData,  "SECCION ELECTORAL")
+
+    return db.to_dict('records'), [{"name": i, "id": i} for i in db.columns]
+
+
 def interactive():
     createAllGeoJson(pathMun, pathShp)
 
@@ -368,6 +392,13 @@ def interactive():
                         id='table3', page_size=21, style_table={'overflowX': 'auto'}))
                 ], align='center')
             ]),
+            style={'margin': '30px'}
+        ),
+        dbc.Card(
+            dbc.CardBody(
+                dcc.Loading(dash_table.DataTable(
+                    id='table4', page_size=21, style_table={'overflowX': 'auto'}))
+            ),
             style={'margin': '30px'}
         ),
     ])
