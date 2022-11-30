@@ -7,10 +7,10 @@ politicalPartiesColors = {'PAN': '#00008B ',	'PRI': '#008000',	'PRD': '#FFD700',
 
 politicalPartiesRange = {'PAN': 'Blues',	'PRI': 'Greens',	'PRD': 'solar',	'PVEM': 'YlGN',	'PT': 'YlOrRd',
                          'MC': 'Oranges',	'MORENA': 'PuRd',	'PES': 'RdPu',	'RSP': 'amp',	'FPM': 'Burg', 'NVA_ALIANZA': 'PuBu',
-                         'PAN_PRD_MC':'aggrnyl', 'PAN_MC':'agsunset', 'PAN_MC': 'bluered', 'PRD_MC':'blugrn',
+                         'PAN_PRD_MC': 'aggrnyl', 'PAN_MC': 'agsunset', 'PAN_MC': 'bluered', 'PRD_MC': 'blugrn',
                          'PT_MORENA': 'brwnyl',
-                         'PAN,PRD Y MC':'gnbu', 'PAN Y PRD': 'greys', 'PAN Y MC': 'magenta', 'PRD Y MC': 'magma',
-                         'PT,MORENA Y ES': 'pubu', 'PT Y MORENA': 'pubugn', 'PT Y ES': 'purd', 'MORENA Y ES': 'purp'}
+                         'PAN,PRD Y MC': 'gnbu', 'PAN Y PRD': 'greys', 'PAN Y MC': 'magenta', 'PRD Y MC': 'magma',
+                         'PT,MORENA Y ES': 'pubu', 'PT Y MORENA': 'pubugn', 'PT Y ES': 'purd', 'MORENA Y ES': 'purp', 'PT, MORENA Y ES': 'purp', 'PAN_PRD': 'purp', 'PAN, PRD Y MC': 'purp'}
 
 
 def paintMap(db, geoJsonFile, locations, keyToMap, idKey):
@@ -18,26 +18,25 @@ def paintMap(db, geoJsonFile, locations, keyToMap, idKey):
 
     if keyToMap == "GANADOR":
         fig = px.choropleth_mapbox(db, geojson=municipalityGeoJson, color=keyToMap,
-                                locations=locations, featureidkey=idKey,
-                                color_discrete_map=politicalPartiesColors,
-                                mapbox_style="carto-positron", zoom=7,height=700,
-                                center={
-                                    'lat': 18.028157,
-                                    'lon': -92.753621
-                                })
+                                   locations=locations, featureidkey=idKey,
+                                   color_discrete_map=politicalPartiesColors,
+                                   mapbox_style="carto-positron", zoom=7, height=700,
+                                   center={
+                                       'lat': 18.028157,
+                                       'lon': -92.753621
+                                   })
     else:
         fig = px.choropleth_mapbox(db, geojson=municipalityGeoJson, color=keyToMap,
-                                locations=locations, featureidkey=idKey,
-                                color_continuous_scale=politicalPartiesRange[keyToMap],
-                                mapbox_style="carto-positron", zoom=7, height=700,
-                                center={
-                                    'lat': 18.028157,
-                                    'lon': -92.753621
-                                })
-        
-
+                                   locations=locations, featureidkey=idKey,
+                                   color_continuous_scale=politicalPartiesRange[keyToMap],
+                                   mapbox_style="carto-positron", zoom=7, height=700,
+                                   center={
+                                       'lat': 18.028157,
+                                       'lon': -92.753621
+                                   })
 
     return fig
+
 
 def createGraphicBar(db, politicalParties, type):
     votes = []

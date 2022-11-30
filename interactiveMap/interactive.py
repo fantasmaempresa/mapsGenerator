@@ -3,6 +3,7 @@ import plotly.express as px
 import dash_bootstrap_components as dbc
 
 from dash import Dash, html, dcc, Input, Output, dash_table
+from dash.dash_table.Format import Format, Scheme, Sign
 
 from interactiveMap.paintMap import paintMap, createGraphicBar
 from interactiveMap.createGeoJson import *
@@ -172,7 +173,7 @@ def createTable(query_type: str):
             db = createDataToTable(
                 pathData,  "SECCION ELECTORAL")
 
-    return db.to_dict('records'), [{"name": i, "id": i} for i in db.columns]
+    return db.to_dict('records'), [{"name": i, "id": i, "type": 'numeric', 'format':Format(precision=2)} for i in db.columns]
 
 
 @app.callback([
