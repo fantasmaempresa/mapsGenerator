@@ -173,7 +173,7 @@ def createTable(query_type: str):
             db = createDataToTable(
                 pathData,  "SECCION ELECTORAL")
 
-    return db.to_dict('records'), [{"name": i, "id": i, "type": 'numeric', 'format':Format(precision=2)} for i in db.columns]
+    return db.to_dict('records'), [{"name": i, "id": i, "type": 'numeric', 'format': Format().group(True)} for i in db.columns]
 
 
 @app.callback([
@@ -198,7 +198,7 @@ def createTable2(query_type: str):
             db = createDataTableRG(
                 pathData,  "SECCION ELECTORAL")
 
-    return db.to_dict('records'), [{"name": i, "id": i} for i in db.columns]
+    return db.to_dict('records'), [{"name": i, "id": i, "type": 'numeric', 'format': Format().group(True)} for i in db.columns]
 
 
 @app.callback(
@@ -268,7 +268,7 @@ def createMapVs(politicalPartiesG1, politicalPartiesG2, queryType):
             fig = paintMap(db, seccGeoJson, "SECCION ELECTORAL",
                            "GANADOR", "properties.seccion")
 
-    return fig, db.to_dict('records'), [{"name": i, "id": i} for i in db.columns]
+    return fig, db.to_dict('records'), [{"name": i, "id": i, "type": 'numeric', 'format': Format().group(True)} for i in db.columns]
 
 
 @app.callback([
@@ -292,7 +292,7 @@ def createTable4(query_type: str):
         elif query_type == 'Secciones':
             db = createDataClassification(pathData,  "SECCION ELECTORAL")
 
-    return db.to_dict('records'), [{"name": i, "id": i} for i in db.columns]
+    return db.to_dict('records'), [{"name": i, "id": i, "type": 'numeric', 'format': Format().group(True)} for i in db.columns]
 
 
 def interactive():
@@ -347,7 +347,18 @@ def interactive():
         dbc.Card(
             dbc.CardBody(
                 dcc.Loading(dash_table.DataTable(
-                    id='table1', page_size=21, style_table={'overflowX': 'auto'}))
+                    id='table1', page_size=21, style_table={'overflowX': 'auto'}, style_data_conditional=[
+                        {
+                            'if': {'row_index': 'odd'},
+                            'backgroundColor': 'rgb(220, 220, 220)',
+                        }
+                    ], style_data={
+                        'color': 'black',
+                        'fontWeight': 'bold'
+                    }, style_header={
+                        'color': 'black',
+                        'fontWeight': 'bold'
+                    }))
             ),
             style={'margin': '30px'}
         ),
@@ -372,7 +383,18 @@ def interactive():
         dbc.Card(
             dbc.CardBody(
                 dcc.Loading(dash_table.DataTable(
-                    id='table2', page_size=21, style_table={'overflowX': 'auto'}))
+                    id='table2', page_size=21, style_table={'overflowX': 'auto'}, style_data_conditional=[
+                        {
+                            'if': {'row_index': 'odd'},
+                            'backgroundColor': 'rgb(220, 220, 220)',
+                        }
+                    ], style_data={
+                        'color': 'black',
+                        'fontWeight': 'bold'
+                    }, style_header={
+                        'color': 'black',
+                        'fontWeight': 'bold'}
+                ))
             ),
             style={'margin': '30px'}
         ),
@@ -390,7 +412,17 @@ def interactive():
                     dcc.Loading(dcc.Graph(id='versus_map',
                                 style={'margin': '20px'})),
                     dcc.Loading(dash_table.DataTable(
-                        id='table3', page_size=21, style_table={'overflowX': 'auto'}))
+                        id='table3', page_size=21, style_table={'overflowX': 'auto'}, style_data_conditional=[
+                            {
+                                'if': {'row_index': 'odd'},
+                                'backgroundColor': 'rgb(220, 220, 220)',
+                            }
+                        ], style_data={
+                            'color': 'black',
+                            'fontWeight': 'bold'
+                        }, style_header={
+                            'color': 'black',
+                            'fontWeight': 'bold'}))
                 ], align='center')
             ]),
             style={'margin': '30px'}
@@ -398,7 +430,17 @@ def interactive():
         dbc.Card(
             dbc.CardBody(
                 dcc.Loading(dash_table.DataTable(
-                    id='table4', page_size=21, style_table={'overflowX': 'auto'}))
+                    id='table4', page_size=21, style_table={'overflowX': 'auto'}, style_data_conditional=[
+                        {
+                            'if': {'row_index': 'odd'},
+                            'backgroundColor': 'rgb(220, 220, 220)',
+                        }
+                    ], style_data={
+                        'color': 'black',
+                        'fontWeight': 'bold'
+                    }, style_header={
+                        'color': 'black',
+                        'fontWeight': 'bold'}))
             ),
             style={'margin': '30px'}
         ),
