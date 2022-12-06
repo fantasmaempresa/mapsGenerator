@@ -53,6 +53,17 @@ def sumPoliticParties(row, politicalParties):
     return sum
 
 
+def putClassification(row, highPriority, mediumPriority):
+    value = row['TOTAL DE VOTOS']
+
+    if value >= highPriority:
+        return 'ALTA (AAA)'
+    elif value >= mediumPriority and value < highPriority:
+        return 'MEDIA (AA)'
+    else:
+        return 'BAJA (A)'
+
+
 def createDataToMap(pathData: str, politicParties, key):
     df = pd.read_csv(pathData)
 
@@ -117,11 +128,12 @@ def createDataTableRG(pathData, key):
         row, dbSecc, 'URBANO'), axis=1)
     db['RURAL'] = db.apply(lambda row: searchTypeName(
         row, dbSecc, 'RURAL'), axis=1)
+    db['TOTAL CASILLAS'] = db.apply(lambda row: 1, axis=1)
 
     db = db.groupby([key]).sum(
         numeric_only=True).T.T.reset_index()
 
-    return db[[key, 'No Propietarios', 'No Suplentes', 'No RGS', 'MIXTO', 'URBANO', 'RURAL']]
+    return db[[key, 'No Propietarios', 'No Suplentes', 'No RGS', 'MIXTO', 'URBANO', 'RURAL', 'TOTAL CASILLAS']]
 
 
 def createDataToVS(pathData, politicalPartiesG1, politicalPartiesG2, key):
@@ -147,17 +159,27 @@ def createDataClassification(pathData, key):
     db = df.groupby([key]).sum(
         numeric_only=True).T.T.reset_index()
 
-    db.drop('SECCION ELECTORAL', inplace=True, axis=1, errors='ignore')
-    db.drop('MUNICIPIO', inplace=True, axis=1, errors='ignore')
     db.drop('NUMERO DE VOTOS VALIDOS', inplace=True, axis=1, errors='ignore')
-    db.drop('TOTAL DE VOTOS', inplace=True, axis=1, errors='ignore')
-    db.drop('LISTA NOMINAL', inplace=True, axis=1, errors='ignore')
     db.drop('% PARTICIPACION CIUDADANA', inplace=True, axis=1, errors='ignore')
-    db.drop('DISTRITO F', inplace=True, axis=1, errors='ignore')
-    db.drop('DISTRITO L', inplace=True, axis=1, errors='ignore')
     db.drop('CASILLA', inplace=True, axis=1, errors='ignore')
+
+    if key == "DISTRITO F":
+        db.drop('SECCION ELECTORAL', axis=1, inplace=True, errors='ignore')
+        db.drop('DISTRITO L', axis=1, inplace=True, errors='ignore')
+    elif key == "DISTRITO L":
+        db.drop('SECCION ELECTORAL', axis=1, inplace=True, errors='ignore')
+        db.drop('DISTRITO F', axis=1, inplace=True, errors='ignore')
+    elif key == "MUNICIPIO":
+        db.drop('SECCION ELECTORAL', axis=1, inplace=True, errors='ignore')
+        db.drop('DISTRITO L', axis=1, inplace=True, errors='ignore')
+        db.drop('DISTRITO F', axis=1, inplace=True, errors='ignore')
+    else:
+        db.drop('DISTRITO L', axis=1, inplace=True, errors='ignore')
+        db.drop('DISTRITO F', axis=1, inplace=True, errors='ignore')
+
+    highPriority = (db['TOTAL DE VOTOS'].max() + db['TOTAL DE VOTOS'].min())/2
+    mediumPriority = (db['TOTAL DE VOTOS'].min() + highPriority) / 2
     
-    db['TOTAL'] = db.mean(axis=1)
-    db.sort_values(by=['TOTAL'], inplace=True)
-    
-    return db
+    db['PRIORIDAD'] = db.apply(lambda row : putClassification(row, highPriority, mediumPriority), axis=1)
+
+    return db.sort_values(by=['TOTAL DE VOTOS'], ascending=False)

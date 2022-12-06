@@ -5,7 +5,7 @@ import dash_bootstrap_components as dbc
 from dash import Dash, html, dcc, Input, Output, dash_table
 from dash.dash_table.Format import Format, Scheme, Sign
 
-from interactiveMap.paintMap import paintMap, createGraphicBar
+from interactiveMap.paintMap import *
 from interactiveMap.createGeoJson import *
 from interactiveMap.createData import *
 
@@ -274,25 +274,35 @@ def createMapVs(politicalPartiesG1, politicalPartiesG2, queryType):
 @app.callback([
     Output('table4', 'data'),
     Output('table4', 'columns'),
+    Output('priority_map', 'figure'),
     Input('query_type', 'value')
 ])
 def createTable4(query_type: str):
     db = pd.DataFrame()
+    fig = px.choropleth_mapbox()
 
     if query_type != '':
         if query_type == 'Municipio':
             db = createDataClassification(pathData, "MUNICIPIO")
+            fig = priorityMap(db, munGeoJson, "MUNICIPIO",
+                              "PRIORIDAD", "properties.municipio")
 
         elif query_type == 'Distrito Local':
             db = createDataClassification(pathData, "DISTRITO L")
+            fig = priorityMap(db, dLGeoJson, "DISTRITO L",
+                              "PRIORIDAD", "properties.district")
 
         elif query_type == 'Distrito Federal':
             db = createDataClassification(pathData, "DISTRITO F")
+            fig = priorityMap(db, dFGeoJson, "DISTRITO F",
+                              "PRIORIDAD", "properties.district")
 
         elif query_type == 'Secciones':
             db = createDataClassification(pathData,  "SECCION ELECTORAL")
+            fig = priorityMap(db, seccGeoJson, "SECCION ELECTORAL",
+                              "PRIORIDAD", "properties.seccion")
 
-    return db.to_dict('records'), [{"name": i, "id": i, "type": 'numeric', 'format': Format().group(True)} for i in db.columns]
+    return db.to_dict('records'), [{"name": i, "id": i, "type": 'numeric', 'format': Format().group(True)} for i in db.columns], fig
 
 
 def interactive():
@@ -429,18 +439,23 @@ def interactive():
         ),
         dbc.Card(
             dbc.CardBody(
-                dcc.Loading(dash_table.DataTable(
-                    id='table4', page_size=21, style_table={'overflowX': 'auto'}, style_data_conditional=[
-                        {
-                            'if': {'row_index': 'odd'},
-                            'backgroundColor': 'rgb(220, 220, 220)',
-                        }
-                    ], style_data={
-                        'color': 'black',
-                        'fontWeight': 'bold'
-                    }, style_header={
-                        'color': 'black',
-                        'fontWeight': 'bold'}))
+                dbc.Row([
+                    dcc.Loading(dash_table.DataTable(
+                        id='table4', page_size=21, style_table={'overflowX': 'auto'}, style_data_conditional=[
+                            {
+                                'if': {'row_index': 'odd'},
+                                'backgroundColor': 'rgb(220, 220, 220)',
+                            }
+                        ], style_data={
+                            'color': 'black',
+                            'fontWeight': 'bold'
+                        }, style_header={
+                            'color': 'black',
+                            'fontWeight': 'bold'})),
+                    dcc.Loading(dcc.Graph(id='priority_map',
+                                          style={'margin': '20px'})),
+
+                ])
             ),
             style={'margin': '30px'}
         ),
