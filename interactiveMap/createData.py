@@ -81,10 +81,15 @@ def createDataToTable(pathData: str, key):
 
     db = df.groupby([key]).sum(
         numeric_only=True).T.T.reset_index()
+    
+    for columnHeader in db.columns:
+        db.at['Total', columnHeader] = db[columnHeader].sum()
 
     db['% PARTICIPACION'] = db.apply(
         lambda row: calculateParticipation(row), axis=1)
 
+    db[key].iloc[-1] = 'TOTAL'
+    
     db.drop('% PARTICIPACION CIUDADANA', axis=1, inplace=True, errors='ignore')
 
     if key == "DISTRITO F":
