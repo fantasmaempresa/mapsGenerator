@@ -81,7 +81,7 @@ def createDataToTable(pathData: str, key):
 
     db = df.groupby([key]).sum(
         numeric_only=True).T.T.reset_index()
-    
+
     for columnHeader in db.columns:
         db.at['Total', columnHeader] = db[columnHeader].sum()
 
@@ -89,7 +89,7 @@ def createDataToTable(pathData: str, key):
         lambda row: calculateParticipation(row), axis=1)
 
     db[key].iloc[-1] = 'TOTAL'
-    
+
     db.drop('% PARTICIPACION CIUDADANA', axis=1, inplace=True, errors='ignore')
 
     if key == "DISTRITO F":
@@ -138,6 +138,11 @@ def createDataTableRG(pathData, key):
     db = db.groupby([key]).sum(
         numeric_only=True).T.T.reset_index()
 
+    for columnHeader in db.columns:
+        db.at['Total', columnHeader] = db[columnHeader].sum()
+
+    db[key].iloc[-1] = 'TOTAL'
+
     return db[[key, 'No Propietarios', 'No Suplentes', 'No RGS', 'MIXTO', 'URBANO', 'RURAL', 'TOTAL CASILLAS']]
 
 
@@ -184,7 +189,8 @@ def createDataClassification(pathData, key):
 
     highPriority = (db['TOTAL DE VOTOS'].max() + db['TOTAL DE VOTOS'].min())/2
     mediumPriority = (db['TOTAL DE VOTOS'].min() + highPriority) / 2
-    
-    db['PRIORIDAD'] = db.apply(lambda row : putClassification(row, highPriority, mediumPriority), axis=1)
+
+    db['PRIORIDAD'] = db.apply(lambda row: putClassification(
+        row, highPriority, mediumPriority), axis=1)
 
     return db.sort_values(by=['TOTAL DE VOTOS'], ascending=False)

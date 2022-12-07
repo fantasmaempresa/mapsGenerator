@@ -361,7 +361,7 @@ def interactive():
                 [
                     html.H2(children='Tabla General'),
                     dcc.Loading(dash_table.DataTable(
-                        id='table1', page_size=21, style_table={'overflowX': 'auto'}, style_data_conditional=[
+                        id='table1', page_size=22, style_table={'overflowX': 'auto'}, style_data_conditional=[
                             {
                                 'if': {'row_index': 'odd'},
                                 'backgroundColor': 'rgb(220, 220, 220)',
@@ -401,7 +401,7 @@ def interactive():
             dbc.CardBody([
                 html.H2(children='Casillas'),
                 dcc.Loading(dash_table.DataTable(
-                    id='table2', page_size=21, style_table={'overflowX': 'auto'}, style_data_conditional=[
+                    id='table2', page_size=22, style_table={'overflowX': 'auto'}, style_data_conditional=[
                         {
                             'if': {'row_index': 'odd'},
                             'backgroundColor': 'rgb(220, 220, 220)',
@@ -431,7 +431,7 @@ def interactive():
                     dcc.Loading(dcc.Graph(id='versus_map',
                                 style={'margin': '20px'})),
                     dcc.Loading(dash_table.DataTable(
-                        id='table3', page_size=21, style_table={'overflowX': 'auto'}, style_data_conditional=[
+                        id='table3', page_size=22, style_table={'overflowX': 'auto'}, style_data_conditional=[
                             {
                                 'if': {'row_index': 'odd'},
                                 'backgroundColor': 'rgb(220, 220, 220)',
@@ -450,7 +450,7 @@ def interactive():
             dbc.CardBody([html.H2(children='Prioridad'),
                           dbc.Row([
                               dcc.Loading(dash_table.DataTable(
-                                  id='table4', page_size=21, style_table={'overflowX': 'auto'}, style_data_conditional=[
+                                  id='table4', page_size=22, style_table={'overflowX': 'auto'}, style_data_conditional=[
                                       {
                                           'if': {'row_index': 'odd'},
                                           'backgroundColor': 'rgb(220, 220, 220)',
