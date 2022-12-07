@@ -311,6 +311,7 @@ def interactive():
     app.layout = html.Div([
         dbc.Card(
             dbc.CardBody([
+                html.H2(children='Filtros'),
                 dbc.Row([
                     dbc.Col([
                         html.Div([
@@ -347,6 +348,7 @@ def interactive():
         ),
         dbc.Card(
             dbc.CardBody([
+                html.H2(children='Comparación por Partido Político'),
                 dbc.Row([
                     dbc.Checklist(id='political_parties', inline=True),
                     dcc.Loading(dcc.Graph(id='comparision_map'))
@@ -356,24 +358,28 @@ def interactive():
         ),
         dbc.Card(
             dbc.CardBody(
-                dcc.Loading(dash_table.DataTable(
-                    id='table1', page_size=21, style_table={'overflowX': 'auto'}, style_data_conditional=[
-                        {
-                            'if': {'row_index': 'odd'},
-                            'backgroundColor': 'rgb(220, 220, 220)',
-                        }
-                    ], style_data={
-                        'color': 'black',
-                        'fontWeight': 'bold'
-                    }, style_header={
-                        'color': 'black',
-                        'fontWeight': 'bold'
-                    }))
+                [
+                    html.H2(children='Tabla General'),
+                    dcc.Loading(dash_table.DataTable(
+                        id='table1', page_size=21, style_table={'overflowX': 'auto'}, style_data_conditional=[
+                            {
+                                'if': {'row_index': 'odd'},
+                                'backgroundColor': 'rgb(220, 220, 220)',
+                            }
+                        ], style_data={
+                            'color': 'black',
+                            'fontWeight': 'bold'
+                        }, style_header={
+                            'color': 'black',
+                            'fontWeight': 'bold'
+                        }))
+                ]
             ),
             style={'margin': '30px'}
         ),
         dbc.Card(
             dbc.CardBody([
+                html.H2(children='Densidad de Votación por Partido Político'),
                 dbc.Row([
                     dbc.RadioItems(id='political_parties_range', inline=True),
                     dcc.Loading(dcc.Graph(id='range_map'))
@@ -383,6 +389,7 @@ def interactive():
         ),
         dbc.Card(
             dbc.CardBody([
+                html.H2(children='Gráfica de Votación por Partido Político'),
                 dbc.Row([
                     dbc.Checklist(id='political_parties_bar', inline=True),
                     dcc.Loading(dcc.Graph(id='bar'))
@@ -391,7 +398,8 @@ def interactive():
             style={'margin': '30px'}
         ),
         dbc.Card(
-            dbc.CardBody(
+            dbc.CardBody([
+                html.H2(children='Casillas'),
                 dcc.Loading(dash_table.DataTable(
                     id='table2', page_size=21, style_table={'overflowX': 'auto'}, style_data_conditional=[
                         {
@@ -405,11 +413,12 @@ def interactive():
                         'color': 'black',
                         'fontWeight': 'bold'}
                 ))
-            ),
+            ]),
             style={'margin': '30px'}
         ),
         dbc.Card(
             dbc.CardBody([
+                html.H2(children='Escenario Político'),
                 dbc.Row([
                     dbc.Col(html.Div([
                         dbc.Label("Grupo 1"),
@@ -438,25 +447,24 @@ def interactive():
             style={'margin': '30px'}
         ),
         dbc.Card(
-            dbc.CardBody(
-                dbc.Row([
-                    dcc.Loading(dash_table.DataTable(
-                        id='table4', page_size=21, style_table={'overflowX': 'auto'}, style_data_conditional=[
-                            {
-                                'if': {'row_index': 'odd'},
-                                'backgroundColor': 'rgb(220, 220, 220)',
-                            }
-                        ], style_data={
-                            'color': 'black',
-                            'fontWeight': 'bold'
-                        }, style_header={
-                            'color': 'black',
-                            'fontWeight': 'bold'})),
-                    dcc.Loading(dcc.Graph(id='priority_map',
+            dbc.CardBody([html.H2(children='Prioridad'),
+                          dbc.Row([
+                              dcc.Loading(dash_table.DataTable(
+                                  id='table4', page_size=21, style_table={'overflowX': 'auto'}, style_data_conditional=[
+                                      {
+                                          'if': {'row_index': 'odd'},
+                                          'backgroundColor': 'rgb(220, 220, 220)',
+                                      }
+                                  ], style_data={
+                                      'color': 'black',
+                                      'fontWeight': 'bold'
+                                  }, style_header={
+                                      'color': 'black',
+                                      'fontWeight': 'bold'})),
+                              dcc.Loading(dcc.Graph(id='priority_map',
                                           style={'margin': '20px'})),
 
-                ])
-            ),
+                          ])]),
             style={'margin': '30px'}
         ),
     ])
