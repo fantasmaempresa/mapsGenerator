@@ -469,4 +469,4 @@ def interactive():
         ),
     ])
 
-    app.run_server(debug=True)
+    app.run_server(debug=False)
