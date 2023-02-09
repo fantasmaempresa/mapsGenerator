@@ -112,6 +112,7 @@ def createComparisionMap(political_parties, query_type: str):
             fig = paintMap(db, seccGeoJson, "SECCION ELECTORAL",
                            "GANADOR", "properties.seccion")
 
+    fig.update_layout(mapbox_style="carto-positron")
     return fig
 
 
@@ -145,6 +146,7 @@ def createRangeMap(politicalParty, queryType):
             fig = paintMap(db, seccGeoJson, "SECCION ELECTORAL",
                            politicalParty, "properties.seccion")
 
+    fig.update_layout(mapbox_style="carto-positron")
     return fig
 
 
@@ -204,8 +206,8 @@ def createTable2(query_type: str):
     Input('query_type', 'value'),
 )
 def createGrafic(politicalParties, queryType: str):
-    fig = px.choropleth_mapbox()
-
+    fig = px.bar()
+    
     if politicalParties and queryType != '' and queryType != None:
         if queryType == 'Municipio':
             db = createDataToMap(pathData, politicalParties, "MUNICIPIO")
@@ -265,6 +267,7 @@ def createMapVs(politicalPartiesG1, politicalPartiesG2, queryType):
             fig = paintMap(db, seccGeoJson, "SECCION ELECTORAL",
                            "GANADOR", "properties.seccion")
 
+    fig.update_layout(mapbox_style="carto-positron")
     return fig, db.to_dict('records'), [{"name": i, "id": i, "type": 'numeric', 'format': Format().group(True)} for i in db.columns]
 
 
@@ -299,6 +302,7 @@ def createTable4(query_type: str):
             fig = priorityMap(db, seccGeoJson, "SECCION ELECTORAL",
                               "PRIORIDAD", "properties.seccion")
 
+    fig.update_layout(mapbox_style="carto-positron")
     return db.to_dict('records'), [{"name": i, "id": i, "type": 'numeric', 'format': Format().group(True)} for i in db.columns], fig
 
 

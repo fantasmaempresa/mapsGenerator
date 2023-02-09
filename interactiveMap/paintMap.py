@@ -23,7 +23,7 @@ def paintMap(db, geoJsonFile, locations, keyToMap, idKey):
         fig = px.choropleth_mapbox(db, geojson=municipalityGeoJson, color=keyToMap,
                                    locations=locations, featureidkey=idKey,
                                    color_discrete_map=politicalPartiesColors,
-                                   mapbox_style="carto-positron", zoom=6, height=700,
+                                   mapbox_style="carto-positron", zoom=7, height=700,
                                    center={
                                        'lat': 19.036398154948944,
                                        'lon': -98.20047860032442
@@ -31,7 +31,8 @@ def paintMap(db, geoJsonFile, locations, keyToMap, idKey):
     else:
         fig = px.choropleth_mapbox(db, geojson=municipalityGeoJson, color=keyToMap,
                                    locations=locations, featureidkey=idKey,
-                                   mapbox_style="carto-positron", zoom=6, height=700,
+                                   color_continuous_scale='purples',
+                                   mapbox_style="carto-positron", zoom=7, height=700,
                                    center={
                                        'lat': 19.036398154948944,
                                        'lon': -98.20047860032442
