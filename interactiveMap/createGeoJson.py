@@ -17,7 +17,7 @@ def createAllGeoJson(pathMun: str, pathShp: str):
         nameData.append(row['municipio'])
         value = row['clave']
         query = dataShp.query(
-            "entidad == 27 & municipio == @value")
+            "entidad == 21 & municipio == @value")
         geoData.append(query['geometry'].unary_union)
 
     data = {'municipio': nameData,
@@ -29,10 +29,10 @@ def createAllGeoJson(pathMun: str, pathShp: str):
     # FEDERAL DISTRICT
     nameData = []
     geoData = []
-    for row in range(6):
+    for row in range(15):
         nameData.append(row + 1)
         value = row + 1
-        query = dataShp.query("entidad == 27 & distrito_f == @value")
+        query = dataShp.query("entidad == 21 & distrito_f == @value")
         geoData.append(query['geometry'].unary_union)
 
     data = {'district': nameData,
@@ -44,10 +44,10 @@ def createAllGeoJson(pathMun: str, pathShp: str):
     # LOCAl DISTRICT
     nameData = []
     geoData = []
-    for row in range(21):
+    for row in range(26):
         nameData.append(row + 1)
         value = row + 1
-        query = dataShp.query("entidad == 27 & distrito_l == @value")
+        query = dataShp.query("entidad == 21 & distrito_l == @value")
         geoData.append(query['geometry'].unary_union)
 
     data = {'district': nameData,
@@ -57,7 +57,7 @@ def createAllGeoJson(pathMun: str, pathShp: str):
     saveGeoJson(data, dLGeoJson)
     
     # SECCIONES
-    dataShp.query("entidad == 27", inplace=True)
+    dataShp.query("entidad == 21", inplace=True)
     dataShp.to_file(seccGeoJson, driver='GeoJSON')
 
 def saveGeoJson(data: dict, fileName: str):

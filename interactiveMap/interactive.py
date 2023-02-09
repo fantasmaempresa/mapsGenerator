@@ -14,9 +14,9 @@ pathShp = 'assets/Tabasco/secc.shp'
 pathMun = 'assets/Tabasco/municipios.csv'
 pathData = ''
 originData = pd.DataFrame({
-    "year": ['2017-2018', '2017-2018', '2017-2018', '2020-2021', '2020-2021'],
-    "type": ['Ayuntamiento', 'Diputados', 'Gobernatura', 'Ayuntamiento', 'Diputados'],
-    "file": ['ayu_general_casillas.csv', 'dip_resumen_general.csv', 'gub_resumen_general.csv', 'ayu_resumen_general.csv', 'dip_resumen_general.csv']
+    "year": ['2019','2019'],
+    "type": ['Ayuntamiento','Gobernatura'],
+    "file": ['ayun_ext_2019.csv','gub_ext_2019.csv']
 })
 
 dataBase = pd.DataFrame()
@@ -59,11 +59,8 @@ def getPoliticPartiesByFile(year: str, candidance_type: str):
         keys = list(data.keys())
         keys.remove('SECCION ELECTORAL')
         keys.remove('MUNICIPIO')
-        keys.remove('NUMERO DE VOTOS VALIDOS')
-        keys.remove('NUMERO DE VOTOS NULOS')
         keys.remove('TOTAL DE VOTOS')
         keys.remove('LISTA NOMINAL')
-        keys.remove('% PARTICIPACION CIUDADANA')
         keys.remove('DISTRITO F')
         keys.remove('DISTRITO L')
 
@@ -469,4 +466,4 @@ def interactive():
         ),
     ])
 
-    app.run_server(debug=False)
+    app.run_server(debug=True)
