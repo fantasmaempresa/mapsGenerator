@@ -14,9 +14,9 @@ pathShp = 'assets/Tabasco/secc.shp'
 pathMun = 'assets/Tabasco/municipios.csv'
 pathData = ''
 originData = pd.DataFrame({
-    "year": ['2019','2019'],
-    "type": ['Ayuntamiento','Gobernatura'],
-    "file": ['ayun_ext_2019.csv','gub_ext_2019.csv']
+    "year": ['2019','2019','2021'],
+    "type": ['Ayuntamiento','Gobernatura','Diputados'],
+    "file": ['ayun_ext_2019.csv','gub_ext_2019.csv','dip_2021.csv']
 })
 
 dataBase = pd.DataFrame()
