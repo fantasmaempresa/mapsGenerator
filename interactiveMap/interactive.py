@@ -76,7 +76,7 @@ def getPoliticPartiesByFile(year: str, candidance_type: str):
 
         if not keys:
             keys.append('A')
-            
+
         ppDict = [{"label": i, "value": i} for i in keys]
 
         return ppDict, keys[0:1], '', ppDict, keys[0], ppDict, keys[0:1], keys, keys[0:1], keys, keys[0:1]
@@ -308,8 +308,11 @@ def createTable4(query_type: str):
     fig.update_layout(mapbox_style="carto-positron")
     return db.to_dict('records'), [{"name": i, "id": i, "type": 'numeric', 'format': Format().group(True)} for i in db.columns], fig
 
+
 @app.callback([
     Output('div-principal', 'style'),
+    Output('div-consulta', 'style'),
+    Output('div-special-map', 'style'),
     Input('year', 'value'),
     Input('candidance_type', 'value'),
 ])
@@ -323,15 +326,37 @@ def showHideElements(year: str, candidance_type: str):
         data = pd.read_csv(pathData)
 
         keys = list(data.keys())
-        
+
         index = keys.index('EXTRA DATA') if 'EXTRA DATA' in keys else -1
-        
+
         if index == -1:
-            return [{'display': 'block'}]
+            return {'display': 'block'}, {'display': 'block'}, {'display': 'none'}
         else:
-            return [{'display': 'none'}]
+            return {'display': 'none'}, {'display': 'none'}, {'display': 'block'}
     else:
-        return [{'display': 'block'}]
+        return {'display': 'block'}, {'display': 'block'}, {'display': 'none'}
+
+
+@app.callback(
+    Output('map_special', 'figure'),
+    Input('candidance_type', 'value'),
+)
+def mapSpecialCase(candidance_type: str):
+    fig = px.choropleth_mapbox()
+
+    if pathData != '':
+        db = pd.read_csv(pathData)
+        keys = list(db.keys())
+
+        index = keys.index('EXTRA DATA') if 'EXTRA DATA' in keys else -1
+
+        if index != -1:
+            fig = paintMap(db, seccGeoJson, "SECCION ELECTORAL",
+                           "EXTRA DATA", "properties.seccion")
+
+    fig.update_layout(mapbox_style="carto-positron")
+    return fig
+
 
 def interactive():
     createAllGeoJson(pathMun, pathShp)
@@ -368,7 +393,7 @@ def interactive():
                                     "label": "Distrito Federal", "value": "Distrito Federal"}, {"label": "Municipio", "value": "Municipio"},
                                     {"label": "Secciones", "value": "Secciones"}]
                             )
-                        ])
+                        ], id="div-consulta")
                     ]),
                 ], align='center')
             ]),
@@ -497,7 +522,18 @@ def interactive():
                               ])]),
                 style={'margin': '30px'}
             ),
-        ], id='div-principal')
+        ], id='div-principal'),
+        html.Div([
+            dbc.Card(
+                dbc.CardBody([
+                    html.H2(children='Prioridad'),
+                    dbc.Row([
+                        dcc.Loading(dcc.Graph(id='map_special'))
+                    ])
+                ]),
+                style={'margin': '30px'}
+            )
+        ], id='div-special-map'),
     ])
 
     app.run_server(debug=True)
