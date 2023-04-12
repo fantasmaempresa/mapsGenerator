@@ -14,9 +14,9 @@ pathShp = 'assets/Tabasco/secc.shp'
 pathMun = 'assets/Tabasco/municipios.csv'
 pathData = ''
 originData = pd.DataFrame({
-    "year": ['2019','2019','2021'],
-    "type": ['Ayuntamiento','Gobernatura','Diputados'],
-    "file": ['ayun_ext_2019.csv','gub_ext_2019.csv','dip_2021.csv']
+    "year": ['2019', '2019', '2021', '2024', '2024'],
+    "type": ['Ayuntamiento', 'Gobernatura', 'Diputados', 'Gobernador', 'Presidente Municipal'],
+    "file": ['ayun_ext_2019.csv', 'gub_ext_2019.csv', 'dip_2021.csv', 'gub_ext_2024.csv', 'mun_ext_2024.csv']
 })
 
 dataBase = pd.DataFrame()
@@ -74,6 +74,9 @@ def getPoliticPartiesByFile(year: str, candidance_type: str):
         except ValueError:
             pass
 
+        if not keys:
+            keys.append('A')
+            
         ppDict = [{"label": i, "value": i} for i in keys]
 
         return ppDict, keys[0:1], '', ppDict, keys[0], ppDict, keys[0:1], keys, keys[0:1], keys, keys[0:1]
@@ -207,7 +210,7 @@ def createTable2(query_type: str):
 )
 def createGrafic(politicalParties, queryType: str):
     fig = px.bar()
-    
+
     if politicalParties and queryType != '' and queryType != None:
         if queryType == 'Municipio':
             db = createDataToMap(pathData, politicalParties, "MUNICIPIO")
@@ -305,6 +308,30 @@ def createTable4(query_type: str):
     fig.update_layout(mapbox_style="carto-positron")
     return db.to_dict('records'), [{"name": i, "id": i, "type": 'numeric', 'format': Format().group(True)} for i in db.columns], fig
 
+@app.callback([
+    Output('div-principal', 'style'),
+    Input('year', 'value'),
+    Input('candidance_type', 'value'),
+])
+def showHideElements(year: str, candidance_type: str):
+    if candidance_type != '' and candidance_type != None:
+        file = originData.query(
+            'year == @year and type == @candidance_type')['file'].iloc[0]
+
+        pathData = 'mapas/' + year + '/csv/' + file
+
+        data = pd.read_csv(pathData)
+
+        keys = list(data.keys())
+        
+        index = keys.index('EXTRA DATA') if 'EXTRA DATA' in keys else -1
+        
+        if index == -1:
+            return [{'display': 'block'}]
+        else:
+            return [{'display': 'none'}]
+    else:
+        return [{'display': 'block'}]
 
 def interactive():
     createAllGeoJson(pathMun, pathShp)
@@ -347,92 +374,64 @@ def interactive():
             ]),
             style={'margin': '30px'}
         ),
-        dbc.Card(
-            dbc.CardBody([
-                html.H2(children='Comparación por Partido Político'),
-                dbc.Row([
-                    dbc.Checklist(id='political_parties', inline=True),
-                    dcc.Loading(dcc.Graph(id='comparision_map'))
-                ])
-            ]),
-            style={'margin': '30px'}
-        ),
-        dbc.Card(
-            dbc.CardBody(
-                [
-                    html.H2(children='Tabla General'),
-                    dcc.Loading(dash_table.DataTable(
-                        id='table1', page_size=22, style_table={'overflowX': 'auto'}, style_data_conditional=[
-                            {
-                                'if': {'row_index': 'odd'},
-                                'backgroundColor': 'rgb(220, 220, 220)',
-                            }
-                        ], style_data={
-                            'color': 'black',
-                            'fontWeight': 'bold'
-                        }, style_header={
-                            'color': 'black',
-                            'fontWeight': 'bold'
-                        }))
-                ]
+        html.Div([
+            dbc.Card(
+                dbc.CardBody([
+                    html.H2(children='Comparación por Partido Político'),
+                    dbc.Row([
+                        dbc.Checklist(id='political_parties', inline=True),
+                        dcc.Loading(dcc.Graph(id='comparision_map'))
+                    ])
+                ]),
+                style={'margin': '30px'}
             ),
-            style={'margin': '30px'}
-        ),
-        dbc.Card(
-            dbc.CardBody([
-                html.H2(children='Densidad de Votación por Partido Político'),
-                dbc.Row([
-                    dbc.RadioItems(id='political_parties_range', inline=True),
-                    dcc.Loading(dcc.Graph(id='range_map'))
-                ])
-            ]),
-            style={'margin': '30px'}
-        ),
-        dbc.Card(
-            dbc.CardBody([
-                html.H2(children='Gráfica de Votación por Partido Político'),
-                dbc.Row([
-                    dbc.Checklist(id='political_parties_bar', inline=True),
-                    dcc.Loading(dcc.Graph(id='bar'))
-                ])
-            ]),
-            style={'margin': '30px'}
-        ),
-        dbc.Card(
-            dbc.CardBody([
-                html.H2(children='Casillas'),
-                dcc.Loading(dash_table.DataTable(
-                    id='table2', page_size=22, style_table={'overflowX': 'auto'}, style_data_conditional=[
-                        {
-                            'if': {'row_index': 'odd'},
-                            'backgroundColor': 'rgb(220, 220, 220)',
-                        }
-                    ], style_data={
-                        'color': 'black',
-                        'fontWeight': 'bold'
-                    }, style_header={
-                        'color': 'black',
-                        'fontWeight': 'bold'}
-                ))
-            ]),
-            style={'margin': '30px'}
-        ),
-        dbc.Card(
-            dbc.CardBody([
-                html.H2(children='Escenario Político'),
-                dbc.Row([
-                    dbc.Col(html.Div([
-                        dbc.Label("Grupo 1"),
-                        dcc.Dropdown(id='political_parties_g1', multi=True)
-                    ])),
-                    dbc.Col(html.Div([
-                        dbc.Label("Grupo 2"),
-                        dcc.Dropdown(id='political_parties_g2', multi=True)
-                    ])),
-                    dcc.Loading(dcc.Graph(id='versus_map',
-                                style={'margin': '20px'})),
+            dbc.Card(
+                dbc.CardBody(
+                    [
+                        html.H2(children='Tabla General'),
+                        dcc.Loading(dash_table.DataTable(
+                            id='table1', page_size=22, style_table={'overflowX': 'auto'}, style_data_conditional=[
+                                {
+                                    'if': {'row_index': 'odd'},
+                                    'backgroundColor': 'rgb(220, 220, 220)',
+                                }
+                            ], style_data={
+                                'color': 'black',
+                                'fontWeight': 'bold'
+                            }, style_header={
+                                'color': 'black',
+                                'fontWeight': 'bold'
+                            }))
+                    ]
+                ),
+                style={'margin': '30px'}
+            ),
+            dbc.Card(
+                dbc.CardBody([
+                    html.H2(children='Densidad de Votación por Partido Político'),
+                    dbc.Row([
+                        dbc.RadioItems(
+                            id='political_parties_range', inline=True),
+                        dcc.Loading(dcc.Graph(id='range_map'))
+                    ])
+                ]),
+                style={'margin': '30px'}
+            ),
+            dbc.Card(
+                dbc.CardBody([
+                    html.H2(children='Gráfica de Votación por Partido Político'),
+                    dbc.Row([
+                        dbc.Checklist(id='political_parties_bar', inline=True),
+                        dcc.Loading(dcc.Graph(id='bar'))
+                    ])
+                ]),
+                style={'margin': '30px'}
+            ),
+            dbc.Card(
+                dbc.CardBody([
+                    html.H2(children='Casillas'),
                     dcc.Loading(dash_table.DataTable(
-                        id='table3', page_size=22, style_table={'overflowX': 'auto'}, style_data_conditional=[
+                        id='table2', page_size=22, style_table={'overflowX': 'auto'}, style_data_conditional=[
                             {
                                 'if': {'row_index': 'odd'},
                                 'backgroundColor': 'rgb(220, 220, 220)',
@@ -442,32 +441,63 @@ def interactive():
                             'fontWeight': 'bold'
                         }, style_header={
                             'color': 'black',
-                            'fontWeight': 'bold'}))
-                ], align='center')
-            ]),
-            style={'margin': '30px'}
-        ),
-        dbc.Card(
-            dbc.CardBody([html.H2(children='Prioridad'),
-                          dbc.Row([
-                              dcc.Loading(dash_table.DataTable(
-                                  id='table4', page_size=22, style_table={'overflowX': 'auto'}, style_data_conditional=[
-                                      {
-                                          'if': {'row_index': 'odd'},
-                                          'backgroundColor': 'rgb(220, 220, 220)',
-                                      }
-                                  ], style_data={
-                                      'color': 'black',
-                                      'fontWeight': 'bold'
-                                  }, style_header={
-                                      'color': 'black',
-                                      'fontWeight': 'bold'})),
-                              dcc.Loading(dcc.Graph(id='priority_map',
-                                          style={'margin': '20px'})),
+                            'fontWeight': 'bold'}
+                    ))
+                ]),
+                style={'margin': '30px'}
+            ),
+            dbc.Card(
+                dbc.CardBody([
+                    html.H2(children='Escenario Político'),
+                    dbc.Row([
+                        dbc.Col(html.Div([
+                            dbc.Label("Grupo 1"),
+                            dcc.Dropdown(id='political_parties_g1', multi=True)
+                        ])),
+                        dbc.Col(html.Div([
+                            dbc.Label("Grupo 2"),
+                            dcc.Dropdown(id='political_parties_g2', multi=True)
+                        ])),
+                        dcc.Loading(dcc.Graph(id='versus_map',
+                                              style={'margin': '20px'})),
+                        dcc.Loading(dash_table.DataTable(
+                            id='table3', page_size=22, style_table={'overflowX': 'auto'}, style_data_conditional=[
+                                {
+                                    'if': {'row_index': 'odd'},
+                                    'backgroundColor': 'rgb(220, 220, 220)',
+                                }
+                            ], style_data={
+                                'color': 'black',
+                                'fontWeight': 'bold'
+                            }, style_header={
+                                'color': 'black',
+                                'fontWeight': 'bold'}))
+                    ], align='center')
+                ]),
+                style={'margin': '30px'}
+            ),
+            dbc.Card(
+                dbc.CardBody([html.H2(children='Prioridad'),
+                              dbc.Row([
+                                  dcc.Loading(dash_table.DataTable(
+                                      id='table4', page_size=22, style_table={'overflowX': 'auto'}, style_data_conditional=[
+                                          {
+                                              'if': {'row_index': 'odd'},
+                                              'backgroundColor': 'rgb(220, 220, 220)',
+                                          }
+                                      ], style_data={
+                                          'color': 'black',
+                                          'fontWeight': 'bold'
+                                      }, style_header={
+                                          'color': 'black',
+                                          'fontWeight': 'bold'})),
+                                  dcc.Loading(dcc.Graph(id='priority_map',
+                                                        style={'margin': '20px'})),
 
-                          ])]),
-            style={'margin': '30px'}
-        ),
+                              ])]),
+                style={'margin': '30px'}
+            ),
+        ], id='div-principal')
     ])
 
     app.run_server(debug=True)
