@@ -17,7 +17,7 @@ def createAllGeoJson(pathMun: str, pathShp: str):
         nameData.append(row['municipio'])
         value = row['clave']
         query = dataShp.query(
-            "entidad == 21 & municipio == @value")
+            "ENTIDAD == 21 & MUNICIPIO == @value")
         geoData.append(query['geometry'].unary_union)
 
     data = {'municipio': nameData,
@@ -25,7 +25,12 @@ def createAllGeoJson(pathMun: str, pathShp: str):
             }
 
     saveGeoJson(data, munGeoJson)
+    
+    # SECCIONES
+    dataShp.query("ENTIDAD == 21 & MUNICIPIO == 133", inplace=True)
+    dataShp.to_file(seccGeoJson, driver='GeoJSON')
 
+def districts(dataShp):
     # FEDERAL DISTRICT
     nameData = []
     geoData = []
@@ -55,10 +60,6 @@ def createAllGeoJson(pathMun: str, pathShp: str):
             }
     
     saveGeoJson(data, dLGeoJson)
-    
-    # SECCIONES
-    dataShp.query("entidad == 21", inplace=True)
-    dataShp.to_file(seccGeoJson, driver='GeoJSON')
 
 def saveGeoJson(data: dict, fileName: str):
     df_marques = pd.DataFrame(data)

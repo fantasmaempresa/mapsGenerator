@@ -10,13 +10,13 @@ from interactiveMap.createGeoJson import *
 from interactiveMap.createData import *
 
 app = Dash(external_stylesheets=[dbc.themes.SOLAR])
-pathShp = 'assets/Tabasco/secc.shp'
-pathMun = 'assets/Tabasco/municipios.csv'
+pathShp = 'assets/Puebla/SECCION.shp'
+pathMun = 'assets/Puebla/municipios.csv'
 pathData = ''
 originData = pd.DataFrame({
-    "year": ['2019', '2019', '2021', '2024', '2024'],
-    "type": ['Ayuntamiento', 'Gobernatura', 'Diputados', 'Gobernador', 'Presidente Municipal'],
-    "file": ['ayun_ext_2019.csv', 'gub_ext_2019.csv', 'dip_2021.csv', 'gub_ext_2024.csv', 'mun_ext_2024.csv']
+    "year": ['2021'],
+    "type": ['Diputados'],
+    "file": ['dip_2021.csv']
 })
 
 dataBase = pd.DataFrame()
@@ -113,7 +113,7 @@ def createComparisionMap(political_parties, query_type: str):
             db = createDataToMap(
                 pathData, political_parties, "SECCION ELECTORAL")
             fig = paintMap(db, seccGeoJson, "SECCION ELECTORAL",
-                           "GANADOR", "properties.seccion")
+                           "GANADOR", "properties.SECCION")
 
     fig.update_layout(mapbox_style="carto-positron")
     return fig
@@ -147,7 +147,7 @@ def createRangeMap(politicalParty, queryType):
             db = createDataToMap(
                 pathData, [politicalParty], "SECCION ELECTORAL")
             fig = paintMap(db, seccGeoJson, "SECCION ELECTORAL",
-                           politicalParty, "properties.seccion")
+                           politicalParty, "properties.SECCION")
 
     fig.update_layout(mapbox_style="carto-positron")
     return fig
@@ -268,7 +268,7 @@ def createMapVs(politicalPartiesG1, politicalPartiesG2, queryType):
             db = createDataToVS(pathData, politicalPartiesG1,
                                 politicalPartiesG2, "SECCION ELECTORAL")
             fig = paintMap(db, seccGeoJson, "SECCION ELECTORAL",
-                           "GANADOR", "properties.seccion")
+                           "GANADOR", "properties.SECCION")
 
     fig.update_layout(mapbox_style="carto-positron")
     return fig, db.to_dict('records'), [{"name": i, "id": i, "type": 'numeric', 'format': Format().group(True)} for i in db.columns]
@@ -303,7 +303,7 @@ def createTable4(query_type: str):
         elif query_type == 'Secciones':
             db = createDataClassification(pathData,  "SECCION ELECTORAL")
             fig = priorityMap(db, seccGeoJson, "SECCION ELECTORAL",
-                              "PRIORIDAD", "properties.seccion")
+                              "PRIORIDAD", "properties.SECCION")
 
     fig.update_layout(mapbox_style="carto-positron")
     return db.to_dict('records'), [{"name": i, "id": i, "type": 'numeric', 'format': Format().group(True)} for i in db.columns], fig
@@ -352,7 +352,7 @@ def mapSpecialCase(candidance_type: str):
 
         if index != -1:
             fig = paintMap(db, seccGeoJson, "SECCION ELECTORAL",
-                           "EXTRA DATA", "properties.seccion")
+                           "EXTRA DATA", "properties.SECCION")
 
     fig.update_layout(mapbox_style="carto-positron")
     return fig
@@ -389,9 +389,7 @@ def interactive():
                             dbc.Label("Tipo Consulta"),
                             dbc.Select(
                                 id='query_type',
-                                options=[{"label": "Distrito Local", "value": "Distrito Local"}, {
-                                    "label": "Distrito Federal", "value": "Distrito Federal"}, {"label": "Municipio", "value": "Municipio"},
-                                    {"label": "Secciones", "value": "Secciones"}]
+                                options=[{"label": "Municipio", "value": "Municipio"}, {"label": "Secciones", "value": "Secciones"}]
                             )
                         ], id="div-consulta")
                     ]),

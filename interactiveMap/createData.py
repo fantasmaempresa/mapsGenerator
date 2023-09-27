@@ -1,6 +1,6 @@
 import pandas as pd
 
-pathSecc = 'assets/Tabasco/secciones.csv'
+pathSecc = 'assets/Puebla/secciones.csv'
 
 
 def getWinner(row, politcParties):
@@ -20,29 +20,38 @@ def searchType(row, dbSecc):
     value = row['SECCION ELECTORAL']
     filter = dbSecc.query('SECCION == @value')
 
-    if filter.iloc[0]['TIPO'] == 'MIXTO':
-        return 10
-    elif filter.iloc[0]['TIPO'] == 'URBANO':
-        return 10
-    elif filter.iloc[0]['TIPO'] == 'RURAL':
-        return 5
-
+    if filter.empty:
+        return 0
+    else:
+        if filter.iloc[0]['TIPO'] == 'MIXTO':
+            return 10
+        elif filter.iloc[0]['TIPO'] == 'URBANO':
+            return 10
+        elif filter.iloc[0]['TIPO'] == 'RURAL':
+            return 5
 
 def searchTypeName(row, dbSecc, type):
     value = row['SECCION ELECTORAL']
     filter = dbSecc.query('SECCION == @value')
 
-    if filter.iloc[0]['TIPO'] == type:
-        return 1
+    if filter.empty:
+        return 2
     else:
-        return 0
+        if filter.iloc[0]['TIPO'] == type:
+            return 1
+        else:
+            return 0
 
 
 def searchMunicipality(row, dbSecc):
     value = value = row['SECCION ELECTORAL']
     filter = dbSecc.query('SECCION == @value')
 
-    return filter.iloc[0]['MUNICIPIO']
+    if filter.empty:
+        return ''
+    else:
+        return filter.iloc[0]['MUNICIPIO']
+        
 
 
 def sumPoliticParties(row, politicalParties):
@@ -119,8 +128,7 @@ def createDataTableRG(pathData, key):
     db = df.groupby(['SECCION ELECTORAL']).sum(
         numeric_only=True).T.T.reset_index()
 
-    db['MUNICIPIO'] = db.apply(
-        lambda row: searchMunicipality(row, dbSecc), axis=1)
+    db['MUNICIPIO'] = db.apply(lambda row: searchMunicipality(row, dbSecc), axis=1)
     db['No RGS'] = db.apply(lambda row: searchType(row, dbSecc), axis=1)
     db['DISTRITO L'] = db.apply(
         lambda row: row['DISTRITO L']/row['No Suplentes'], axis=1)
