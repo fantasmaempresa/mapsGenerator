@@ -6,18 +6,26 @@ dFGeoJson = 'assets/geoJson/federalDistrict.geojson'
 dLGeoJson = 'assets/geoJson/localDistrict.geojson'
 seccGeoJson = 'assets/geoJson/seccion.geojson'
 
-def createAllGeoJson(pathMun: str, pathShp: str):
-    data = pd.read_csv(pathMun)
+pathDBMun = 'assets/Puebla/DB/municipios.csv'
+pathDBSecc = 'assets/Puebla/DB/secciones.csv'
+
+pathMun = 'assets/Puebla/municipios.csv'
+pathSecc = 'assets/Puebla/secciones.csv'
+
+def createAllGeoJson(pathShp: str, mapType: str):
+    filterData(mapType)
+    type = 'GENERAL'
+
+    munData = pd.read_csv(pathMun)
     dataShp = geopandas.read_file(pathShp)
 
     # MUNICIPALITIES
     nameData = []
     geoData = []
-    for index, row in data.iterrows():
+    for index, row in munData.iterrows():
         nameData.append(row['municipio'])
         value = row['clave']
-        query = dataShp.query(
-            "ENTIDAD == 21 & MUNICIPIO == @value")
+        query = dataShp.query("MUNICIPIO == @value")
         geoData.append(query['geometry'].unary_union)
 
     data = {'municipio': nameData,
@@ -27,8 +35,13 @@ def createAllGeoJson(pathMun: str, pathShp: str):
     saveGeoJson(data, munGeoJson)
     
     # SECCIONES
-    dataShp.query("ENTIDAD == 21 & MUNICIPIO == 133", inplace=True)
+    if mapType != 0:
+        type = munData.iloc[0]['municipio']
+        value = munData.iloc[0]['clave']
+        dataShp.query("MUNICIPIO == @value", inplace=True)
+
     dataShp.to_file(seccGeoJson, driver='GeoJSON')
+    return type
 
 def districts(dataShp):
     # FEDERAL DISTRICT
@@ -61,6 +74,18 @@ def districts(dataShp):
     
     saveGeoJson(data, dLGeoJson)
 
+def filterData(munType):
+    munData = pd.read_csv(pathDBMun)
+    seccData = pd.read_csv(pathDBSecc)
+
+    if munType != 0:
+        munData = munData.query('clave == @munType')
+        value = munData.iloc[0]['municipio']
+        seccData = seccData.query('MUNICIPIO == @value')
+
+    munData.to_csv(pathMun,index=False)
+    seccData.to_csv(pathSecc, index=False)
+ 
 def saveGeoJson(data: dict, fileName: str):
     df_marques = pd.DataFrame(data)
     geoJson = geopandas.GeoDataFrame(df_marques, crs='epsg:4326')

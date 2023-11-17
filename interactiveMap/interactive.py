@@ -10,13 +10,15 @@ from interactiveMap.createGeoJson import *
 from interactiveMap.createData import *
 
 app = Dash(external_stylesheets=[dbc.themes.SOLAR])
-pathShp = 'assets/Puebla/SECCION.shp'
-pathMun = 'assets/Puebla/municipios.csv'
+pathShp = 'assets/Puebla/SHP/SECCION.shp'
+
 pathData = ''
+type = ''
+
 originData = pd.DataFrame({
-    "year": ['2021'],
-    "type": ['Diputados'],
-    "file": ['dip_2021.csv']
+    "year": ['2019','2021'],
+    "type": ['Gobernatura','Diputados'],
+    "file": ['gub_ext_2019.csv','dip_2021.csv']
 })
 
 dataBase = pd.DataFrame()
@@ -52,9 +54,14 @@ def getPoliticPartiesByFile(year: str, candidance_type: str):
         file = originData.query(
             'year == @year and type == @candidance_type')['file'].iloc[0]
 
-        pathData = 'mapas/' + year + '/csv/' + file
+        pathDB = 'mapas/' + year + '/csv/' + file
 
-        data = pd.read_csv(pathData)
+        data = pd.read_csv(pathDB)
+        if type != 'GENERAL':
+            data.query('MUNICIPIO == @type', inplace=True)
+        
+        pathData = 'mapas/DB.csv'
+        data.to_csv(pathData, index=False)
 
         keys = list(data.keys())
         keys.remove('SECCION ELECTORAL')
@@ -358,10 +365,12 @@ def mapSpecialCase(candidance_type: str):
     return fig
 
 
-def interactive():
-    createAllGeoJson(pathMun, pathShp)
+def interactive(mapType):
+    global type
+    type = createAllGeoJson(pathShp, mapType)
 
     app.layout = html.Div([
+        html.H2(children=type),
         dbc.Card(
             dbc.CardBody([
                 html.H2(children='Filtros'),

@@ -11,10 +11,8 @@ def getWinner(row, politcParties):
 
     return max(dictWinners, key=dictWinners.get)
 
-
 def calculateParticipation(row):
     return (row['TOTAL DE VOTOS'] * 100) / row['LISTA NOMINAL']
-
 
 def searchType(row, dbSecc):
     value = row['SECCION ELECTORAL']
@@ -29,6 +27,8 @@ def searchType(row, dbSecc):
             return 10
         elif filter.iloc[0]['TIPO'] == 'RURAL':
             return 5
+        else:
+            return 0
 
 def searchTypeName(row, dbSecc, type):
     value = row['SECCION ELECTORAL']
@@ -42,7 +42,6 @@ def searchTypeName(row, dbSecc, type):
         else:
             return 0
 
-
 def searchMunicipality(row, dbSecc):
     value = value = row['SECCION ELECTORAL']
     filter = dbSecc.query('SECCION == @value')
@@ -52,15 +51,12 @@ def searchMunicipality(row, dbSecc):
     else:
         return filter.iloc[0]['MUNICIPIO']
         
-
-
 def sumPoliticParties(row, politicalParties):
     sum = 0
     for item in politicalParties:
         sum = sum + row[item]
 
     return sum
-
 
 def putClassification(row, highPriority, mediumPriority):
     value = row['TOTAL DE VOTOS']

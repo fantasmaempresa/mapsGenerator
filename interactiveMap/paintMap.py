@@ -23,19 +23,19 @@ def paintMap(db, geoJsonFile, locations, keyToMap, idKey):
         fig = px.choropleth_mapbox(db, geojson=municipalityGeoJson, color=keyToMap,
                                    locations=locations, featureidkey=idKey,
                                    color_discrete_map=politicalPartiesColors,
-                                   mapbox_style="carto-positron", zoom=11, height=700,
+                                   mapbox_style="carto-positron", zoom=8.75, height=700,
                                    center={
-                                       'lat': 19.2884539,
-                                       'lon': -98.458055
+                                       'lat': 19.3569488,
+                                       'lon': -98.1472529
                                    })
     else:
         fig = px.choropleth_mapbox(db, geojson=municipalityGeoJson, color=keyToMap,
                                    locations=locations, featureidkey=idKey,
                                    color_continuous_scale='purples',
-                                   mapbox_style="carto-positron", zoom=10, height=700,
+                                   mapbox_style="carto-positron", zoom=8.75, height=700,
                                    center={
-                                       'lat': 19.2884539,
-                                       'lon': -98.458055
+                                       'lat': 19.3569488,
+                                       'lon': -98.1472529
                                    })
 
     return fig
@@ -69,9 +69,9 @@ def priorityMap(db, geoJsonFile, locations, keyToMap, idKey):
     fig = px.choropleth_mapbox(db, geojson=geoJson, color=keyToMap,
                                locations=locations, featureidkey=idKey,
                                color_discrete_map=priorityColors,
-                               mapbox_style="carto-positron", zoom=7, height=700,
+                               mapbox_style="carto-positron", zoom=8.75, height=700,
                                center={
-                                   'lat': 19.036398154948944,
-                                   'lon': -98.20047860032442
+                                   'lat': 19.3569488,
+                                   'lon': -98.1472529
                                })
     return fig
