@@ -368,7 +368,7 @@ def mapSpecialCase(candidance_type: str):
 def interactive(mapType):
     global type
     type = createAllGeoJson(pathShp, mapType)
-
+    # type = "PUEBLA"
     app.layout = html.Div([
         html.H2(children=type),
         dbc.Card(
@@ -398,7 +398,11 @@ def interactive(mapType):
                             dbc.Label("Tipo Consulta"),
                             dbc.Select(
                                 id='query_type',
-                                options=[{"label": "Municipio", "value": "Municipio"}, {"label": "Secciones", "value": "Secciones"}]
+                                options=[
+                                    {"label": "Distrito Local", "value": "Distrito Local"},
+                                    {"label": "Distrito Federal", "value": "Distrito Federal"},
+                                    {"label": "Municipio", "value": "Municipio"},
+                                    {"label": "Secciones", "value": "Secciones"}]
                             )
                         ], id="div-consulta")
                     ]),
