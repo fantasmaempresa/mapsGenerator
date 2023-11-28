@@ -196,5 +196,8 @@ def createDataClassification(pathData, key):
 
     db['PRIORIDAD'] = db.apply(lambda row: putClassification(
         row, highPriority, mediumPriority), axis=1)
+    
+    aux = db.sort_values(by=['TOTAL DE VOTOS'], ascending=False)
+    aux.to_csv('prioridad.csv')
 
     return db.sort_values(by=['TOTAL DE VOTOS'], ascending=False)
