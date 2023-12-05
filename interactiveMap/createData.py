@@ -77,6 +77,8 @@ def createDataToMap(pathData: str, politicParties, key):
 
     db['GANADOR'] = db.apply(lambda row: getWinner(
         row, politicParties), axis=1)
+    
+    db.to_csv('ganador.csv')
 
     return db
 
@@ -164,7 +166,9 @@ def createDataToVS(pathData, politicalPartiesG1, politicalPartiesG2, key):
     db['GANADOR'] = db.apply(lambda row: getWinner(
         row, ['_'.join(politicalPartiesG1), '_'.join(politicalPartiesG2)]), axis=1)
 
-    return db[[key, '_'.join(politicalPartiesG1), '_'.join(politicalPartiesG2), 'GANADOR']]
+    finalDB = db[[key, '_'.join(politicalPartiesG1), '_'.join(politicalPartiesG2), 'GANADOR']]
+    # finalDB.to_csv('vs.csv')
+    return finalDB
 
 
 def createDataClassification(pathData, key):
@@ -198,6 +202,6 @@ def createDataClassification(pathData, key):
         row, highPriority, mediumPriority), axis=1)
     
     aux = db.sort_values(by=['TOTAL DE VOTOS'], ascending=False)
-    aux.to_csv('prioridad.csv')
+    # aux.to_csv('prioridad.csv')
 
     return db.sort_values(by=['TOTAL DE VOTOS'], ascending=False)
