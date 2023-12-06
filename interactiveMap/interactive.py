@@ -311,6 +311,10 @@ def createTable4(query_type: str):
             db = createDataClassification(pathData,  "SECCION ELECTORAL")
             fig = priorityMap(db, seccGeoJson, "SECCION ELECTORAL",
                               "PRIORIDAD", "properties.SECCION")
+        elif query_type == 'Junta Auxiliar':
+            db = createDataClassification(pathData,  "JA")
+            fig = priorityMap(db, jaGeoJson, "JA",
+                              "PRIORIDAD", "properties.junta_auxiliar")
 
     fig.update_layout(mapbox_style="carto-positron")
     return db.to_dict('records'), [{"name": i, "id": i, "type": 'numeric', 'format': Format().group(True)} for i in db.columns], fig
@@ -401,6 +405,7 @@ def interactive(mapType):
                                 options=[
                                     {"label": "Distrito Local", "value": "Distrito Local"},
                                     {"label": "Distrito Federal", "value": "Distrito Federal"},
+                                    {"label": "Junta Auxiliar", "value": "Junta Auxiliar"},
                                     {"label": "Municipio", "value": "Municipio"},
                                     {"label": "Secciones", "value": "Secciones"}]
                             )

@@ -24,28 +24,28 @@ def createAllGeoJson(pathShp: str, mapType: str):
     
     dataShp = geopandas.read_file(pathShp)
 
-    # # MUNICIPALITIES
-    # nameData = []
-    # geoData = []
-    # for index, row in munData.iterrows():
-    #     nameData.append(row['municipio'])
-    #     value = row['clave']
-    #     query = dataShp.query("MUNICIPIO == @value")
-    #     geoData.append(query['geometry'].unary_union)
+    # MUNICIPALITIES
+    nameData = []
+    geoData = []
+    for index, row in munData.iterrows():
+        nameData.append(row['municipio'])
+        value = row['clave']
+        query = dataShp.query("MUNICIPIO == @value")
+        geoData.append(query['geometry'].unary_union)
 
-    # data = {'municipio': nameData,
-    #         'geometry': geoData
-    #         }
+    data = {'municipio': nameData,
+            'geometry': geoData
+            }
 
-    # saveGeoJson(data, munGeoJson)
+    saveGeoJson(data, munGeoJson)
     
-    # # SECCIONES
-    # if mapType != 0:
-    #     type = munData.iloc[0]['municipio']
-    #     value = munData.iloc[0]['clave']
-    #     dataShp.query("MUNICIPIO == @value", inplace=True)
+    # SECCIONES
+    if mapType != 0:
+        type = munData.iloc[0]['municipio']
+        value = munData.iloc[0]['clave']
+        dataShp.query("MUNICIPIO == @value", inplace=True)
 
-    # dataShp.to_file(seccGeoJson, driver='GeoJSON')
+    dataShp.to_file(seccGeoJson, driver='GeoJSON')
     
     #JUNTA AUXILIAR
     munData = []
@@ -54,22 +54,16 @@ def createAllGeoJson(pathShp: str, mapType: str):
         
     ja = pd.Series(jaData['JA']).unique().tolist()
 
-    i = 1
     for item in ja:
         secciones = jaData.query("JA == @item")
         query = ''
-        for index, secc in secciones.iterrows():
-            value = secc['SECCION']
-            query = query + "SECCION == @value or "
 
-        print(i)
-        query = query[:-3]
-        query = dataShp.query(query)
+        query_values = secciones['SECCION'].tolist()
+        query = dataShp[dataShp['SECCION'].isin(query_values)]
             
         munData.append("Puebla")
         jaDataA.append(item)
         geoData.append(query['geometry'].unary_union)
-        i = i + 1
             
     data = {'municipio': munData,
             'junta_auxiliar': jaDataA,

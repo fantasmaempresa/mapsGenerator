@@ -5,4 +5,6 @@ interactiveMap/__pycache__/
 choroplethOp/__pycache__/
 
 # Secciones
-assets/Tabasco/secc.*
+assets/Puebla/ja.csv
+assets/Puebla/municipios.csv
+assets/Puebla/secciones.csv

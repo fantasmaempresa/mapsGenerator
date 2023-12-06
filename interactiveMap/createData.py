@@ -202,6 +202,6 @@ def createDataClassification(pathData, key):
         row, highPriority, mediumPriority), axis=1)
     
     aux = db.sort_values(by=['TOTAL DE VOTOS'], ascending=False)
-    # aux.to_csv('prioridad.csv')
+    aux.to_csv('prioridad.csv')
 
     return db.sort_values(by=['TOTAL DE VOTOS'], ascending=False)
