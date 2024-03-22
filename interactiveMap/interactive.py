@@ -16,9 +16,9 @@ pathData = ''
 type = ''
 
 originData = pd.DataFrame({
-    "year": ['2011','2011','2011','2013','2013','2019','2021'],
-    "type": ['Gobernatura','Diputados','Ayuntamiento','Diputados','Ayuntamiento','Gobernatura','Diputados'],
-    "file": ['gobernatura.csv','diputados.csv','ayuntamiento.csv','diputados.csv','ayuntamiento.csv','gub_ext_2019.csv','dip_2021.csv']
+    "year": ['2011','2011','2011','2013','2013','2019','2021','2021'],
+    "type": ['Gobernatura','Diputados','Ayuntamiento','Diputados','Ayuntamiento','Gobernatura','Diputados','Presidencia'],
+    "file": ['gobernatura.csv','diputados.csv','ayuntamiento.csv','diputados.csv','ayuntamiento.csv','gub_ext_2019.csv','dip_2021.csv', 'presi_2021.csv']
 })
 
 dataBase = pd.DataFrame()
